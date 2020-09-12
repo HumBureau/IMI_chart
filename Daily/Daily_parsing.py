@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[17]:
+# In[ ]:
 
 
 #данный скрипт: 
@@ -31,7 +31,7 @@
 ### - обновляет уже хранящиеся данные в csv файлах каждого стриминга, лежащие в корневой директории
 
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -44,16 +44,15 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 
-# In[13]:
+# In[ ]:
 
 
 #установка и импорт selenium
-get_ipython().system('pip install selenium')
 from selenium import webdriver as wb
-get_ipython().system('pip install chromedriver')
+#!pip install chromedriver
 
 
-# In[3]:
+# In[ ]:
 
 
 #задаем команду для получения даты
@@ -62,7 +61,7 @@ currentDT = datetime.datetime.now()
 
 # ### Deezer Russia Top 100
 
-# In[4]:
+# In[ ]:
 
 
 request_deezer = requests.get('https://api.deezer.com/playlist/1116189381') #ссылка на постоянный плейлист
@@ -82,7 +81,7 @@ deezer_top_100_daily["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")
 # чарт этого дня готов
 
 
-# In[5]:
+# In[ ]:
 
 
 # берем имеющийся csv файл и обновляем его
@@ -96,7 +95,7 @@ all_deezer.to_csv("all_deezer.csv", encoding = "utf-8")
 
 # ### Apple Music
 
-# In[6]:
+# In[ ]:
 
 
 base_url = 'https://music.apple.com/us/playlist/top-100-russia/pl.728bd30a9247487c80a483f4168a9dcd'
@@ -142,7 +141,7 @@ date = currentDT - relativedelta(days=+1)
 apple_music_top_100_daily["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")  
 
 
-# In[8]:
+# In[ ]:
 
 
 #берем имеющийся csv файл и обновляем его
@@ -156,13 +155,13 @@ all_apple.to_csv("all_apple.csv", encoding = "utf-8")
 
 # ### VK 
 
-# In[9]:
+# In[ ]:
 
 
 #selenium-часть
 
 url='https://vk.com'
-br = wb.Chrome()
+br = wb.Chrome("/Users/sergey/chromedriver")
 br.get(url)
 sleep(randint(2,4))
 e_mail_window = br.find_element_by_css_selector("#index_email")
@@ -189,7 +188,7 @@ soup = BeautifulSoup(br.page_source)
 br.quit()
 
 
-# In[10]:
+# In[ ]:
 
 
 #работаем с html
@@ -207,7 +206,7 @@ date = currentDT - relativedelta(days=+1)
 vk_music_top_100_daily["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")  
 
 
-# In[12]:
+# In[ ]:
 
 
 #берем имеющийся csv файл и обновляем его
