@@ -31,7 +31,7 @@
 ### - обновляет уже хранящиеся данные в csv файлах каждого стриминга, лежащие в корневой директории
 
 
-# In[ ]:
+# In[3]:
 
 
 import pandas as pd
@@ -40,11 +40,11 @@ import requests
 from bs4 import BeautifulSoup
 from time import sleep
 from random import randint
-import datetime
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-# In[ ]:
+# In[4]:
 
 
 #установка и импорт selenium
@@ -52,50 +52,16 @@ from selenium import webdriver as wb
 #!pip install chromedriver
 
 
-# In[ ]:
+# In[5]:
 
 
 #задаем команду для получения даты
-currentDT = datetime.datetime.now() 
-
-
-# ### Deezer Russia Top 100
-
-# In[ ]:
-
-
-request_deezer = requests.get('https://api.deezer.com/playlist/1116189381') #ссылка на постоянный плейлист
-deezer_chart_json = request_deezer.json() #через API получаем json 
-deezer_top_100_daily = pd.DataFrame(deezer_chart_json['tracks']['data']) #выбираем только список треков
-artists_deezer_top = [] #поскольку имена артистов "запакованы", осуществляем распаковку через цикл и заново приклеиваем к датафрейму
-for i in range(0, 100):
-    artists_deezer_top.append(deezer_chart_json['tracks']['data'][i]['artist']['name'])
-deezer_top_100_daily['artist'] = artists_deezer_top
-deezer_top_100_daily['rank'] = deezer_top_100_daily.reset_index().index +1 
-deezer_top_100_daily = deezer_top_100_daily[['rank', 'title', 'artist']]
-
-# дата = предыдущий день (относительно дня скрейпинга)
-date = currentDT 
-deezer_top_100_daily["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")  
-
-# чарт этого дня готов
-
-
-# In[ ]:
-
-
-# берем имеющийся csv файл и обновляем его
-
-all_deezer = pd.read_csv("all_deezer.csv")
-all_deezer = all_deezer.drop(all_deezer.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку 
-frames = [all_deezer, deezer_top_100_daily]
-all_deezer = pd.concat(frames, sort=False)
-all_deezer.to_csv("all_deezer.csv", encoding = "utf-8")
+currentDT = datetime.now() 
 
 
 # ### Apple Music
 
-# In[ ]:
+# In[6]:
 
 
 base_url = 'https://music.apple.com/us/playlist/top-100-russia/pl.728bd30a9247487c80a483f4168a9dcd'
@@ -138,10 +104,10 @@ apple_music_top_100_daily = apple_music_top_100_daily[['rank', 'title', 'artist'
 
 #дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
-apple_music_top_100_daily["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")  
+apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")  
 
 
-# In[ ]:
+# In[7]:
 
 
 #берем имеющийся csv файл и обновляем его
@@ -203,7 +169,7 @@ data = {"rank": [i for i in range(1, 101)], "title": songs_clean, "artist":artis
 vk_music_top_100_daily = pd.DataFrame(data)
 #дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
-vk_music_top_100_daily["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")  
+vk_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")  
 
 
 # In[ ]:

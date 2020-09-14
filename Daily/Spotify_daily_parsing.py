@@ -27,7 +27,7 @@ import requests
 from bs4 import BeautifulSoup
 from time import sleep
 from random import randint
-import datetime
+from datetime import datetime, date, time, timezone
 from dateutil.relativedelta import relativedelta
 
 
@@ -35,7 +35,7 @@ from dateutil.relativedelta import relativedelta
 
 
 #задаем команду для получения даты
-currentDT = datetime.datetime.now() 
+currentDT = datetime.now() 
 
 
 # In[3]:
@@ -70,7 +70,7 @@ for tr in tbody.find_all('tr'):
 daily_spotify_top_200 = pd.DataFrame(all_rows, columns =['rank','title', "artist",'streams'])
 #записываемая дата = предыдущий день! (как и значится в самом спотифае)
 date = currentDT - relativedelta(days=+1)
-daily_spotify_top_200["date"] = datetime.datetime.strftime(date,"%d/%m/%Y")  
+daily_spotify_top_200["date"] = datetime.strftime(date,"%d/%m/%Y")  
 
 
 # In[4]:
@@ -83,4 +83,10 @@ all_daily_spotify = all_daily_spotify.drop(all_daily_spotify.columns[[0]], axis=
 frames = [all_daily_spotify, daily_spotify_top_200]
 all_daily_spotify = pd.concat(frames, sort=False)
 all_daily_spotify.to_csv("all_daily_spotify.csv", encoding = "utf-8")
+
+
+# In[ ]:
+
+
+
 

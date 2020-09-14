@@ -17,7 +17,7 @@
 ## - сохраняет 4 json файла с новыми недельными чартами
 
 
-# In[1]:
+# In[18]:
 
 
 import pandas as pd
@@ -31,7 +31,7 @@ from datetime import datetime, date, time, timezone
 from dateutil.relativedelta import relativedelta
 
 
-# In[2]:
+# In[20]:
 
 
 #задаем команду для получения даты
@@ -57,7 +57,7 @@ for i in all_charts:
     i.drop(i.columns[[0]], axis=1, inplace=True)
 
 
-# In[5]:
+# In[4]:
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -104,7 +104,7 @@ def average(df, X):
     return new_chart
 
 
-# In[4]:
+# In[5]:
 
 
 #просто техническая функция для отображения изначальных имен чартов
@@ -232,7 +232,7 @@ for c in all_charts:
 
 # ### Добавление колонок, отвечающих за динамику показателей
 
-# In[18]:
+# In[10]:
 
 
 #загружаем все чарты, агрегированные за неделю
@@ -253,7 +253,7 @@ for i in all_weekly_charts:
     i.drop_duplicates(inplace=True)
 
 
-# In[12]:
+# In[11]:
 
 
 #функция для подсчета количества недель, которые песня держится в чарте
@@ -277,7 +277,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[13]:
+# In[12]:
 
 
 #пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -330,7 +330,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[19]:
+# In[13]:
 
 
 #count all new metrics
@@ -343,7 +343,7 @@ yandex_curr_week = metrics_delta(all_yandex_weekly)
 
 # ### ЭКСПОРТ
 
-# In[26]:
+# In[14]:
 
 
 apple_curr_week.name ="apple"
@@ -352,7 +352,7 @@ vk_curr_week.name ="vk"
 yandex_curr_week.name ="yandex"
 
 
-# In[29]:
+# In[15]:
 
 
 ### EXPORT TO JSON, HTML, CSV 
@@ -385,4 +385,10 @@ for ch in all_curr_week_charts:
     
     html_name = "current_"+name_of_chart+"_html.html"
     ch_html.to_html(html_name, encoding = "utf-8")
+
+
+# In[ ]:
+
+
+
 

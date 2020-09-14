@@ -17,7 +17,7 @@
 #2) в полночь создает чарт яндекса за прошедший день и обновляет all_yandex.csv
 
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -27,6 +27,7 @@ from bs4 import BeautifulSoup
 from time import sleep
 from random import randint
 import datetime
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from time import sleep
 
@@ -43,6 +44,8 @@ yandex_music_top_100_daily = pd.DataFrame(columns=["rank", "title", "artist"])
 #парсинг:
 today = datetime.strftime(datetime.now(),"%d/%m/%Y")
 end_time = datetime.strptime(today+ " 23:59", "%d/%m/%Y %H:%M")
+
+n_of_scrapes =0 #счетчик 
 
 while datetime.now() <= end_time:
     
@@ -81,18 +84,18 @@ while datetime.now() <= end_time:
     yandex_music_top_100_daily_now["time"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     
     yandex_music_top_100_daily = yandex_music_top_100_daily.append(yandex_music_top_100_daily_now, ignore_index = True)
-    
+    n_of_scrapes +=1 
     sleep(1800) #засыпаем на полчаса - примерная периодичность обновления чарта    
 
 
-# In[15]:
+# In[ ]:
 
 
 #сохраняем внутридневные данные
 yandex_music_top_100_daily.to_csv("all_yandex_intra_daily.csv", mode='a', encoding = "utf-8")
 
 
-# In[61]:
+# In[ ]:
 
 
 #усредняем данные за день и получаем чарт дня 
@@ -104,8 +107,13 @@ df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] #кодируем песн�
 
 for i in set(list(df["full_id"])):
     s_df = df[df["full_id"]==i] #таблица с одной песней
-    avg_rank = sum(list(s_df["rank"]))/len(s_df) #считаем среднюю строку песни
-    add_df = pd.DataFrame()
+    l_w_ranks = list(s_df["rank"])    
+    delta = n_of_scrapes - len(s_df) 
+    for i in range(0,delta):
+        l_w_ranks.append(101) #присуждаем песне 101-ю строчку в те моменты, когда она не попала в чарт 
+        
+    avg_rank = sum(l_w_ranks)/n_of_scrapes #считаем среднюю строку песни 
+    add_df = pd.DataFrame() 
     add_df["raw_rank"] = [avg_rank]
     add_df["title"] = i.split("#bh#_#bh#")[0]
     add_df["artist"] = i.split("#bh#_#bh#")[1]
