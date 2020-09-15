@@ -1,2 +1,5 @@
 secrets.yaml
 **/chrome-data/
+**/*.csv
+**/*.html
+**/*.json
