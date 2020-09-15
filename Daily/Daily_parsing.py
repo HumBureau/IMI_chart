@@ -4,7 +4,7 @@
 # In[ ]:
 
 
-#данный скрипт:
+# данный скрипт:
 
 
 ## - осуществляет парсинг ежедневных чартов
@@ -48,7 +48,7 @@ from selenium.webdriver.chrome.options import Options
 # In[5]:
 
 
-#задаем команду для получения даты
+# задаем команду для получения даты
 currentDT = datetime.now()
 
 
@@ -65,7 +65,7 @@ table = soup.findAll('div', attrs={'class':'header-and-songs-list'})
 songs = soup.findAll('div', attrs={'class':'song-name typography-label'})
 artists = soup.findAll('div', attrs={'class':'by-line typography-caption'})
 
-#чистим названия треков
+# чистим названия треков
 songs_clean = BeautifulSoup(str(songs), "lxml").text.split(", \n")
 new_l=[]
 for i in songs_clean:
@@ -77,7 +77,7 @@ for i in songs_clean:
 songs_clean = new_l
 
 
-#чистим названия артистов
+# чистим названия артистов
 artists_clean = BeautifulSoup(str(artists), "lxml").text.split("\n, \n")
 new_l=[]
 for i in artists_clean:
@@ -95,7 +95,7 @@ apple_music_top_100_daily['artist'] = artists_clean
 apple_music_top_100_daily['rank'] = apple_music_top_100_daily.reset_index().index +1
 apple_music_top_100_daily = apple_music_top_100_daily[['rank', 'title', 'artist']]
 
-#дата = предыдущий день (относительно дня скрейпинга)
+# дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
 apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 
@@ -103,10 +103,10 @@ apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 # In[7]:
 
 
-#берем имеющийся csv файл и обновляем его
+# берем имеющийся csv файл и обновляем его
 
 all_apple = pd.read_csv("all_apple.csv")
-all_apple = all_apple.drop(all_apple.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку
+all_apple = all_apple.drop(all_apple.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
 frames = [all_apple, apple_music_top_100_daily]
 all_apple = pd.concat(frames, sort=False)
 all_apple.to_csv("all_apple.csv", encoding = "utf-8")
@@ -117,7 +117,7 @@ all_apple.to_csv("all_apple.csv", encoding = "utf-8")
 # In[ ]:
 
 
-#selenium-часть
+# selenium-часть
 chrome_options = Options()
 chrome_options.add_argument("--user-data-dir=chrome-data")
 br = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
@@ -127,7 +127,7 @@ sleep(randint(2,4))
 
 if br.current_url == "https://vk.com/feed":
     print("great, cookies worked for no-login authorisation")
-    #now we proceed with scraping
+    # now we proceed with scraping
 
     button2 = br.find_element_by_xpath('//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
     button2.click()
@@ -147,7 +147,7 @@ else:
 # In[ ]:
 
 
-#работаем с html
+# работаем с html
 
 songs = soup.findAll('span', attrs={'class':"audio_row__title_inner _audio_row__title_inner"})
 artists = soup.findAll('div', attrs={'class':"audio_row__performers"})
@@ -157,7 +157,7 @@ artists_clean = [i.get_text() for i in artists]
 
 data = {"rank": [i for i in range(1, 101)], "title": songs_clean, "artist":artists_clean}
 vk_music_top_100_daily = pd.DataFrame(data)
-#дата = предыдущий день (относительно дня скрейпинга)
+# дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
 vk_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 
@@ -165,10 +165,10 @@ vk_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 # In[ ]:
 
 
-#берем имеющийся csv файл и обновляем его
+# берем имеющийся csv файл и обновляем его
 
 all_vk = pd.read_csv("all_vk.csv")
-all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку
+all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
 frames = [all_vk, vk_music_top_100_daily]
 all_vk = pd.concat(frames, sort=False)
 all_vk.to_csv("all_vk.csv", encoding = "utf-8")

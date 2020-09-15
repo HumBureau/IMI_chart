@@ -4,7 +4,7 @@
 # In[1]:
 
 
-#данный скрипт: 
+# данный скрипт:
 
 ## - осуществляет парсинг еженедельного чарта Spotify Top 200 Russia
 
@@ -41,10 +41,10 @@ currentDT = datetime.now()
 
 ############################## Сам парсинг #############################
 
-#базовая ссылка на последний актуальный еженедельный чарт по России
+# базовая ссылка на последний актуальный еженедельный чарт по России
 base_url = 'https://spotifycharts.com/regional/ru/weekly/latest'
 r = requests.get(base_url)
-#на всякий случай поставим на паузу
+# на всякий случай поставим на паузу
 sleep(randint(1,3))
 soup = BeautifulSoup(r.text, 'html.parser')
 chart = soup.find('table', {'class': 'chart-table'})
@@ -52,27 +52,27 @@ tbody = chart.find('tbody')
 all_rows = []
 
 
-#сам скрэйпинг
+# сам скрэйпинг
 for tr in tbody.find_all('tr'):
-    #позиция трека
+    # позиция трека
     rank_text = tr.find('td', {'class': 'chart-table-position'}).text
-    #артист
+    # артист
     artist_text = tr.find('td', {'class': 'chart-table-track'}).find('span').text
     artist_text = artist_text.replace('by ','').strip()
-    #название трека
+    # название трека
     title_text = tr.find('td', {'class': 'chart-table-track'}).find('strong').text
-    #кол-во стримов для трека
+    # кол-во стримов для трека
     streams_text = tr.find('td', {'class': 'chart-table-streams'}).text
     #cборка таблицы (цикл на случай парсинга нескольких чартов)
     all_rows.append( [rank_text, title_text, artist_text, streams_text] )
     
-#создаем читаемый датафрейм в pandas
+# создаем читаемый датафрейм в pandas
 rus_spotify_top_200 = pd.DataFrame(all_rows, columns =['rank','title', "artist",'streams'])
 
 #date = дата скрейпинга!
 rus_spotify_top_200["date"] = currentDT.strftime("%d/%m/%Y")  
 
-#записываем неделю 
+# записываем неделю
 date_start = currentDT - relativedelta(days=+7)
 date_end = currentDT - relativedelta(days=+1)
 week = datetime.strftime(date_start,"%d/%m/%y") + " - " + datetime.strftime(date_end,"%d/%m/%y")
@@ -84,17 +84,17 @@ rus_spotify_top_200["week"] = week
 # In[3]:
 
 
-#функция для подсчета количества недель, которые песня держится в чарте
+# функция для подсчета количества недель, которые песня держится в чарте
 
 def weeks_in_chart(weekly_charts):
     
     df = weekly_charts
-    df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] #кодируем песню, чтобы избежать путаницы с одинаковыми названиями
+    df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] # кодируем песню, чтобы избежать путаницы с одинаковыми названиями
 
     return_df = pd.DataFrame(columns = ['title', 'artist', "weeks_in_chart"])
 
     for i in set(list(df["full_id"])):
-        s_df = df[df["full_id"]==i] #таблица с одной песней
+        s_df = df[df["full_id"]==i] # таблица с одной песней
         n_of_w = len(s_df)
         add_df = pd.DataFrame()
         add_df["weeks_in_chart"] = [n_of_w]
@@ -108,7 +108,7 @@ def weeks_in_chart(weekly_charts):
 # In[80]:
 
 
-#пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
+# пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
 
 def metrics_delta(chart):
     
@@ -123,10 +123,10 @@ def metrics_delta(chart):
     
     #### change in rank vs previous week
     
-    chart_last_week = chart.loc[chart['week'] == chart['week'].values[-1]] #назначаем  последнюю неделю
+    chart_last_week = chart.loc[chart['week'] == chart['week'].values[-1]] # назначаем  последнюю неделю
     chart_dropped  = chart.drop(chart[chart['week'] == chart['week'].values[-1]].index)
     
-    #назначаем предыдущую неделю
+    # назначаем предыдущую неделю
     if len(chart_dropped) == 0:
         chart_previous_week = chart.loc[chart['week'] == chart['week'].values[1]]
     else: chart_previous_week = chart_dropped.loc[chart_dropped['week'] == chart_dropped['week'].values[-1]]
@@ -145,12 +145,12 @@ def metrics_delta(chart):
     chart_upd = pd.merge(chart_upd, weeks_in_chart(chart), how='left', on=['title', 'artist'])
     
     
-    #присоединяем данные о best_pos 
+    # присоединяем данные о best_pos
     chart_upd.drop("best_pos", 1, inplace=True)
     new_chart = pd.merge(chart_upd, best_pos, how='left', on=['title', 'artist'])
     chart_last_week = new_chart.loc[new_chart['week'] == new_chart['week'].values[-1]]
     
-    #чистим
+    # чистим
     chart_last_week = chart_last_week.rename(columns={'rank_x': 'rank'})
     chart_last_week.drop('rank_y', 1, inplace=True)
     
@@ -161,7 +161,7 @@ def metrics_delta(chart):
 # In[72]:
 
 
-#функция для подсчета изменения прослушиваний
+# функция для подсчета изменения прослушиваний
 def streams_delta_spot(chart): 
     
     try:
@@ -186,9 +186,9 @@ def streams_delta_spot(chart):
 # In[ ]:
 
 
-#соединяем старые данные с новыми
+# соединяем старые данные с новыми
 all_spotify = pd.read_csv("all_spotify.csv")
-all_spotify = all_spotify.drop(all_spotify.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку 
+all_spotify = all_spotify.drop(all_spotify.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
 frames = [all_spotify, rus_spotify_top_200]
 all_spotify = pd.concat(frames, sort=False) 
 
@@ -196,7 +196,7 @@ all_spotify = pd.concat(frames, sort=False)
 # In[ ]:
 
 
-#подсчитываем все дополнительные показатели
+# подсчитываем все дополнительные показатели
 sp1 = streams_delta_spot(all_spotify) #count delta_streams
 spotify_curr_week = metrics_delta(all_spotify) #count other metrics
 spotify_curr_week.drop("delta_streams", 1, inplace=True) #drop so that columns don't duplicate
@@ -218,7 +218,7 @@ with open('current_spotify_json.json', 'w', encoding='utf-8') as file:
 
 
 ### EXPORT TO HTML
-#сохраняем html для использования на сайте (т.е. через Make_weekly_charts.py впоследствии)
+# сохраняем html для использования на сайте (т.е. через Make_weekly_charts.py впоследствии)
 spotify_curr_week_html=spotify_curr_week[["rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart", "week"]]
 spotify_curr_week_html.columns = ["Позиция", "Изменение позиции", "Лучшая позиция", "Название", "Артист", "Прослушивания", "Динамика прослушиваний", "Недель в чарте", "Неделя"]
 spotify_curr_week_html.to_html("current_spotify_html.html", encoding = "utf-8")
@@ -228,10 +228,10 @@ spotify_curr_week_html.to_html("current_spotify_html.html", encoding = "utf-8")
 
 
 ### EXPORT TO CSV - (i.e. TO THE MAIN DATABASE)
-#берем имеющийся в корневой директории csv файл и обновляем его
+# берем имеющийся в корневой директории csv файл и обновляем его
 
 all_spotify = pd.read_csv("all_spotify.csv")
-all_spotify = all_spotify.drop(all_spotify.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку 
+all_spotify = all_spotify.drop(all_spotify.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
 frames = [all_spotify, spotify_curr_week]
 all_spotify = pd.concat(frames, sort=False)
 all_spotify.to_csv("all_spotify.csv", encoding = "utf-8")

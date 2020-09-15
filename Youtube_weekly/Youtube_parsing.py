@@ -4,7 +4,7 @@
 # In[1]:
 
 
-#данный скрипт: 
+# данный скрипт:
 
 ## - осуществляет парсинг еженедельного чарта Top Tracks Youtube 
 ### - через selenium
@@ -31,13 +31,14 @@ from datetime import datetime, date, time, timezone
 from dateutil.relativedelta import relativedelta
 import csv 
 import json 
-currentDT = datetime.now() 
+currentDT = datetime.now()
+# from IPython import get_ipython
 
 
 # In[3]:
 
 
-#установка и импорт selenium
+# установка и импорт selenium
 get_ipython().system('pip install selenium')
 from selenium import webdriver as wb
 get_ipython().system('pip install chromedriver')
@@ -60,7 +61,7 @@ br.quit()
 # In[4]:
 
 
-#работаем с html
+# работаем с html
 soup = BeautifulSoup(generated_html, 'html.parser')
 
 all_together = soup.findAll('span', attrs={'class':'ytmc-ellipsis-text style-scope'})
@@ -83,7 +84,7 @@ youtube_tracks_top_100= youtube_tracks_top_100[['rank', 'title', 'artist', 'stre
 #date = дата скрейпинга!
 youtube_tracks_top_100["date"] = currentDT.strftime("%d/%m/%Y")  
 
-#записываем неделю 
+# записываем неделю
 date_start = currentDT - relativedelta(days=+7)
 date_end = currentDT - relativedelta(days=+1)
 week = datetime.strftime(date_start,"%d/%m/%y") + " - " + datetime.strftime(date_end,"%d/%m/%y")
@@ -95,17 +96,17 @@ youtube_tracks_top_100["week"] = week
 # In[35]:
 
 
-#функция для подсчета количества недель, которые песня держится в чарте
+# функция для подсчета количества недель, которые песня держится в чарте
 
 def weeks_in_chart(weekly_charts):
     
     df = weekly_charts
-    df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] #кодируем песню, чтобы избежать путаницы с одинаковыми названиями
+    df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] # кодируем песню, чтобы избежать путаницы с одинаковыми названиями
 
     return_df = pd.DataFrame(columns = ['title', 'artist', "weeks_in_chart"])
 
     for i in set(list(df["full_id"])):
-        s_df = df[df["full_id"]==i] #таблица с одной песней
+        s_df = df[df["full_id"]==i] # таблица с одной песней
         n_of_w = len(s_df)
         add_df = pd.DataFrame()
         add_df["weeks_in_chart"] = [n_of_w]
@@ -119,7 +120,7 @@ def weeks_in_chart(weekly_charts):
 # In[46]:
 
 
-#пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
+# пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
 
 def metrics_delta(chart):
     
@@ -134,10 +135,10 @@ def metrics_delta(chart):
     
     #### change in rank vs previous week
     
-    chart_last_week = chart.loc[chart['week'] == chart['week'].values[-1]] #назначаем  последнюю неделю
+    chart_last_week = chart.loc[chart['week'] == chart['week'].values[-1]] # назначаем  последнюю неделю
     chart_dropped  = chart.drop(chart[chart['week'] == chart['week'].values[-1]].index)
     
-    #назначаем предыдущую неделю
+    # назначаем предыдущую неделю
     if len(chart_dropped) == 0:
         chart_previous_week = chart.loc[chart['week'] == chart['week'].values[1]]
     else: chart_previous_week = chart_dropped.loc[chart_dropped['week'] == chart_dropped['week'].values[-1]]
@@ -156,12 +157,12 @@ def metrics_delta(chart):
     chart_upd = pd.merge(chart_upd, weeks_in_chart(chart), how='left', on=['title', 'artist'])
     
     
-    #присоединяем данные о best_pos 
+    # присоединяем данные о best_pos
     chart_upd.drop("best_pos", 1, inplace=True)
     new_chart = pd.merge(chart_upd, best_pos, how='left', on=['title', 'artist'])
     chart_last_week = new_chart.loc[new_chart['week'] == new_chart['week'].values[-1]]
     
-    #чистим
+    # чистим
     chart_last_week = chart_last_week.rename(columns={'rank_x': 'rank'})
     chart_last_week.drop('rank_y', 1, inplace=True)
     
@@ -194,9 +195,9 @@ def streams_delta_yout(chart):
 # In[72]:
 
 
-#соединяем старые данные с новыми
+# соединяем старые данные с новыми
 all_youtube = pd.read_csv("all_youtube.csv")
-all_youtube = all_youtube.drop(all_youtube.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку 
+all_youtube = all_youtube.drop(all_youtube.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
 frames = [all_youtube, youtube_tracks_top_100] 
 all_youtube = pd.concat(frames, sort=False)     
 
@@ -207,7 +208,7 @@ all_youtube = pd.concat(frames, sort=False)
 #count change in streams
 y1 = streams_delta_yout(all_youtube)
 
-#считаем остальные доп показатели
+# считаем остальные доп показатели
 youtube_curr_week = metrics_delta(all_youtube)
 
 youtube_curr_week.drop("delta_streams", 1, inplace=True) #drop so that columns don't duplicate
@@ -229,7 +230,7 @@ with open('current_youtube_json.json', 'w', encoding='utf-8') as file:
 
 
 ### EXPORT TO HTML
-#сохраняем html для использования на сайте (т.е. через Make_weekly_charts.py впоследствии)
+# сохраняем html для использования на сайте (т.е. через Make_weekly_charts.py впоследствии)
 youtube_curr_week_html=youtube_curr_week[["rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart", "week"]]
 youtube_curr_week_html.columns = ["Позиция", "Изменение позиции", "Лучшая позиция", "Название", "Артист", "Прослушивания", "Динамика прослушиваний", "Недель в чарте", "Неделя"]
 youtube_curr_week_html.to_html("current_youtube_html.html", encoding = "utf-8")
@@ -239,10 +240,10 @@ youtube_curr_week_html.to_html("current_youtube_html.html", encoding = "utf-8")
 
 
 ### EXPORT TO CSV - (i.e. TO THE MAIN DATABASE)
-#берем имеющийся в корневой директории csv файл и обновляем его
+# берем имеющийся в корневой директории csv файл и обновляем его
 
 all_youtube = pd.read_csv("all_youtube.csv")
-all_youtube = all_youtube.drop(all_youtube.columns[[0]], axis=1) #удаляем получающуюся после импорта лишнюю колонку 
+all_youtube = all_youtube.drop(all_youtube.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
 frames = [all_youtube, youtube_curr_week]
 all_youtube = pd.concat(frames, sort=False)
 all_youtube.to_csv("all_youtube.csv", encoding = "utf-8")
