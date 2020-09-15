@@ -98,8 +98,8 @@ A так же скрипты:
 Каждое утро воскрсенья:
 - Youtube_parsing
 
+------------
 
+# Scripts
 
-
-
-
+- run ``git rm --cached `git ls-files -i -X .gitignore`` to exclude ignored files from repository
