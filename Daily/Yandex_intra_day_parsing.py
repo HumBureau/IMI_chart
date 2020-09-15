@@ -56,11 +56,12 @@ while datetime.now() <= end_time:
     soup = BeautifulSoup(r.text, 'html.parser')
     songs = soup.findAll('div', attrs={'class':'d-track__name'})
     artists = soup.findAll('span', attrs={'class':'d-track__artists'})
-    full_id = [j+i for i in songs for j in artists]
+
 #делаем список вторичных названий песен (слов вроде remix, cover, и тд), чтобы они не сливались с названиями 
     sec_titles = soup.findAll('span', attrs={'class':'d-track__version deco-typo-secondary'})
     sec_titles_clean = [i.get_text() for i in sec_titles]
     sec_titles_clean = sorted(sec_titles_clean, reverse=True, key=len)
+
 
 #чистим названия песен и артистов
     songs_clean = [i.get_text() for i in songs]
@@ -75,6 +76,7 @@ while datetime.now() <= end_time:
         new_l.append(v)
     songs_clean = new_l
     artists_clean = [i.get_text() for i in artists]
+
 
     yandex_music_top_100_daily_now = pd.DataFrame()
     yandex_music_top_100_daily_now['title'] = songs_clean
