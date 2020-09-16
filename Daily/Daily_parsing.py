@@ -22,9 +22,6 @@
 ### VK: 2:45 a.m Москва
 ### => обновлять вместе с Apple Music
 
-### Deezer: неустановленное хаотическое время
-### => обновлять вместе с Apple Music 
-
 
 
 ## - на выходе:
@@ -43,13 +40,9 @@ from random import randint
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-
-# In[4]:
-
-
-#установка и импорт selenium
-from selenium import webdriver as wb
-#!pip install chromedriver
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
 
 # In[5]:
@@ -125,33 +118,30 @@ all_apple.to_csv("all_apple.csv", encoding = "utf-8")
 
 
 #selenium-часть
-
+chrome_options = Options()
+chrome_options.add_argument("--user-data-dir=chrome-data")
+br = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
 url='https://vk.com'
-br = wb.Chrome("/Users/sergey/chromedriver")
 br.get(url)
 sleep(randint(2,4))
-e_mail_window = br.find_element_by_css_selector("#index_email")
-password_window = br.find_element_by_css_selector("#index_pass")
- ### ENTER LOGIN / PASSWORD ###
-login_vk = "VKLOGIN"
-password_vk = "VKPASSWORD"
- ###  ###
-e_mail_window.send_keys(login_vk)
-password_window.send_keys(password_vk)
-button1 = br.find_element_by_xpath('//*[(@id = "index_login_button")]')
-button1.click()
-sleep(randint(19,20))
-button2 = br.find_element_by_xpath('//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
-button2.click()
-sleep(randint(4,5))
-button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
-button3.click()
-sleep(randint(4,5))
-button4 = br.find_element_by_css_selector('div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
-button4.click()
-sleep(randint(10,11))
-soup = BeautifulSoup(br.page_source)
-br.quit()
+
+if br.current_url == "https://vk.com/feed":
+    print("great, cookies worked for no-login authorisation")
+    #now we proceed with scraping
+    
+    button2 = br.find_element_by_xpath('//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
+    button2.click()
+    sleep(randint(4,5))
+    button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
+    button3.click()
+    sleep(randint(4,5))
+    button4 = br.find_element_by_css_selector('div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
+    button4.click()
+    sleep(randint(10,11))
+    soup = BeautifulSoup(br.page_source)
+    br.quit()
+else:
+    print("ERROR: please do manual login")
 
 
 # In[ ]:
