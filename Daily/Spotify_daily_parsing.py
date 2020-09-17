@@ -11,11 +11,11 @@
 # речь идет других о ежедневных чартах (Apple Music, VK, Deezer) и о рассчитывании их еженедельных чартов
 # причина - в спотифае есть 200 строк, а в вышеупомянутых - 100.
 
-## - должен запускаться каждый день один раз в сутки в 15:40 по мск. 
+# - должен запускаться каждый день один раз в сутки в 15:40 по мск.
 
 # на выходе:
-## обновляет all_daily_spotify.csv
-### затем этот файл используется в Make_daily_charts.py
+# обновляет all_daily_spotify.csv
+# затем этот файл используется в Make_daily_charts.py
 
 
 # In[1]:
@@ -35,7 +35,7 @@ from dateutil.relativedelta import relativedelta
 
 
 # задаем команду для получения даты
-currentDT = datetime.now() 
+currentDT = datetime.now()
 
 
 # In[3]:
@@ -45,7 +45,7 @@ currentDT = datetime.now()
 base_url = 'https://spotifycharts.com/regional/ru/daily/latest'
 r = requests.get(base_url)
 # на всякий случай поставим на паузу
-sleep(randint(1,3))
+sleep(randint(1, 3))
 soup = BeautifulSoup(r.text, 'html.parser')
 chart = soup.find('table', {'class': 'chart-table'})
 tbody = chart.find('tbody')
@@ -58,19 +58,19 @@ for tr in tbody.find_all('tr'):
     rank_text = tr.find('td', {'class': 'chart-table-position'}).text
     # артист
     artist_text = tr.find('td', {'class': 'chart-table-track'}).find('span').text
-    artist_text = artist_text.replace('by ','').strip()
+    artist_text = artist_text.replace('by ', '').strip()
     # название трека
     title_text = tr.find('td', {'class': 'chart-table-track'}).find('strong').text
     # кол-во стримов для трека
     streams_text = tr.find('td', {'class': 'chart-table-streams'}).text
-    #cборка таблицы (цикл на случай парсинга нескольких чартов)
-    all_rows.append( [rank_text, title_text, artist_text, streams_text] )
-    
+    # cборка таблицы (цикл на случай парсинга нескольких чартов)
+    all_rows.append([rank_text, title_text, artist_text, streams_text])
+
 # создаем читаемый датафрейм в pandas
-daily_spotify_top_200 = pd.DataFrame(all_rows, columns =['rank','title', "artist",'streams'])
+daily_spotify_top_200 = pd.DataFrame(all_rows, columns=['rank', 'title', "artist", 'streams'])
 # записываемая дата = предыдущий день! (как и значится в самом спотифае)
 date = currentDT - relativedelta(days=+1)
-daily_spotify_top_200["date"] = datetime.strftime(date,"%d/%m/%Y")  
+daily_spotify_top_200["date"] = datetime.strftime(date, "%d/%m/%Y")
 
 
 # In[4]:
@@ -79,14 +79,11 @@ daily_spotify_top_200["date"] = datetime.strftime(date,"%d/%m/%Y")
 # берем имеющийся csv файл и обновляем его
 
 all_daily_spotify = pd.read_csv("all_daily_spotify.csv")
-all_daily_spotify = all_daily_spotify.drop(all_daily_spotify.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку
+# удаляем получающуюся после импорта лишнюю колонку
+all_daily_spotify = all_daily_spotify.drop(all_daily_spotify.columns[[0]], axis=1)
 frames = [all_daily_spotify, daily_spotify_top_200]
 all_daily_spotify = pd.concat(frames, sort=False)
-all_daily_spotify.to_csv("all_daily_spotify.csv", encoding = "utf-8")
+all_daily_spotify.to_csv("all_daily_spotify.csv", encoding="utf-8")
 
 
 # In[ ]:
-
-
-
-
