@@ -95,7 +95,7 @@ A так же скрипты:
 - Make_weekly_charts
 - Spotify_parsing
 
-Каждое утро воскрсенья:
+Каждое утро воскрeсенья:
 - Youtube_parsing
 
 ------------
