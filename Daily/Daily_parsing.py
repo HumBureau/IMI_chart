@@ -119,6 +119,7 @@ all_apple.to_csv("all_apple.csv", encoding="utf-8")
 # selenium-часть
 chrome_options = Options()
 chrome_options.add_argument("--user-data-dir=chrome-data")
+chrome_options.add_argument("--headless")
 br = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
 url = 'https://vk.com'
 br.get(url)
