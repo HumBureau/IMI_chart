@@ -125,7 +125,10 @@ yandex_music_top_100_daily_now.to_csv("all_yandex_intra_daily.csv", mode='a', en
 # читаем сколько было скрейпингов уже
 fd = os.open( "y_nofscrapes.txt", os.O_RDWR|os.O_CREAT)
 imp = os.read(fd,100)
-old_n_of_scrapes = int(str(imp)[2:-1])
+try:
+    old_n_of_scrapes = int(str(imp)[2:-1])
+except ValueError:
+    old_n_of_scrapes = 0
 os.close( fd )
 
 if old_n_of_scrapes == 0:
