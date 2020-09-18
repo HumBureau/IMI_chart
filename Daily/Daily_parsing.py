@@ -103,7 +103,7 @@ apple_music_top_100_daily["date"] = datetime.strftime(date, "%d/%m/%Y")
 
 
 if os.path.exists("all_apple.csv") == False:
-    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', "date"])
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', "date"])
     df.to_csv("all_apple.csv", encoding="utf-8")
 
 # берем имеющийся csv файл и обновляем его
@@ -171,7 +171,7 @@ vk_music_top_100_daily["date"] = datetime.strftime(date, "%d/%m/%Y")
 # In[ ]:
 
 if os.path.exists("all_vk.csv") == False:
-    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', "date"])
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', "date"])
     df.to_csv("all_vk.csv", encoding="utf-8")
 
 # берем имеющийся csv файл и обновляем его

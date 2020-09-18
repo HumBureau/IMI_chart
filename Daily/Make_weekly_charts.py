@@ -41,9 +41,8 @@ currentDT = datetime.now()
 # In[3]:
 
 if os.path.exists("all_yandex.csv") == False:
-    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', "date"])
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', "date"])
     df.to_csv("all_yandex.csv", encoding="utf-8")
-
 
 # загружаем полные базы данных по всем ежедневным чартам
 all_vk = pd.read_csv("all_vk.csv")
@@ -201,7 +200,7 @@ for c in all_simple_charts:
     # обновляем csv c предыдущими еженедельными чартами
     name_of_weekly_chart = name_of_chart + "_weekly.csv"
     if os.path.exists(name_of_weekly_chart) == False:
-        df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', 'week', 'raw_rank',
+        df = pd.DataFrame(columns=['rank', 'title', 'artist', 'week', 'raw_rank',
                                    'full_id', 'delta_rank', 'weeks_in_chart', 'best_pos'])
         df.to_csv(name_of_weekly_chart, encoding="utf-8")
     old_csv = pd.read_csv(name_of_weekly_chart)
@@ -215,7 +214,7 @@ for c in all_simple_charts:
 # выполняем функцию average_ya
 
 if os.path.exists("all_yandex_weekly.csv") == False:
-    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', 'week', 'raw_rank',
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', 'week', 'raw_rank',
                                'full_id', 'delta_rank', 'weeks_in_chart', 'best_pos'])
     df.to_csv("all_yandex_weekly.csv", encoding="utf-8")
 

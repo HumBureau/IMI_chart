@@ -189,7 +189,7 @@ def streams_delta_yout(chart):
 # In[72]:
 
 if os.path.exists("all_youtube.csv") == False:
-    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', 'date', 'streams', 'week',
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', 'date', 'streams', 'week',
                                'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams'])
     df.to_csv("all_youtube.csv", encoding="utf-8")
 

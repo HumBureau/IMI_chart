@@ -44,7 +44,7 @@ def avg():
     yandex_daily_avg = pd.DataFrame(columns=['raw_rank', 'title', 'artist', "date"])
 
     if os.path.exists("yandex_intra_daily_today.csv") == False:
-        df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', "date"])
+        df = pd.DataFrame(columns=['rank', 'title', 'artist', "date"])
         df.to_csv("yandex_intra_daily_today.csv", encoding="utf-8")
 
     df = pd.read_csv("yandex_intra_daily_today.csv")

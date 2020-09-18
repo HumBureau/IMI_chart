@@ -182,7 +182,7 @@ def streams_delta_spot(chart):
 # In[ ]:
 
 if os.path.exists("all_spotify.csv") == False:
-    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', 'date', 'streams', 'week',
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', 'date', 'streams', 'week',
                                'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams', 'full_id'])
     df.to_csv("all_spotify.csv", encoding="utf-8")
 
