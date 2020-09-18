@@ -1,0 +1,7 @@
+30 * * * * python3 ~/IMI_Chart/Daily/Yandex_intra_day_parsing.py
+35 * * * * python3 ~/IMI_Chart/Daily/Deezer_daily_parsing.py
+30 11 * * * python3 ~/IMI_Chart/Daily/Daily_parsing.py
+14 15 * * * python3 ~/IMI_Chart/Daily/Spotify_daily_parsing.py
+30 11 * * 5 python3 ~/IMI_Chart/Daily/Make_weekly_charts.py
+35 11 * * 5 python3 ~/IMI_Chart/Daily/Spotify_parsing.py
+1 10 * * 0 python3 ~/IMI_Chart/Daily/Youtube_parsing.py
