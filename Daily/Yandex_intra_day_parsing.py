@@ -23,17 +23,15 @@
 # In[ ]:
 
 
+from bs4 import BeautifulSoup
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from random import randint
+from time import sleep
+import os
 import pandas as pd
 import re
 import requests
-from bs4 import BeautifulSoup
-from time import sleep
-from random import randint
-import datetime
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from time import sleep
-import os
 
 
 # In[ ]:
@@ -44,6 +42,10 @@ def avg():
     # усредняем данные за день и получаем чарт дня
 
     yandex_daily_avg = pd.DataFrame(columns=['raw_rank', 'title', 'artist', "date"])
+
+    if os.path.exists("yandex_intra_daily_today.csv") == False:
+        df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', "date"])
+        df.to_csv("yandex_intra_daily_today.csv", encoding="utf-8")
 
     df = pd.read_csv("yandex_intra_daily_today.csv")
     # кодируем песню, чтобы избежать путаницы с одинаковыми названиями

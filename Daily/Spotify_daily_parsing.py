@@ -21,6 +21,7 @@
 # In[1]:
 
 
+import os
 import pandas as pd
 import re
 import requests
@@ -75,6 +76,10 @@ daily_spotify_top_200["date"] = datetime.strftime(date, "%d/%m/%Y")
 
 # In[4]:
 
+
+if os.path.exists("all_daily_spotify.csv") == False:
+    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', "date", 'streams'])
+    df.to_csv("all_daily_spotify.csv", encoding="utf-8")
 
 # берем имеющийся csv файл и обновляем его
 

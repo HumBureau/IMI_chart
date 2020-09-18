@@ -20,17 +20,18 @@
 # In[1]:
 
 
+from bs4 import BeautifulSoup
+from datetime import datetime, date, time, timezone
+from dateutil.relativedelta import relativedelta
+from random import randint
+from time import sleep
+import csv
+import json
+import os
 import pandas as pd
 import re
 import requests
-from bs4 import BeautifulSoup
-from time import sleep
-from random import randint
-import datetime
-from datetime import datetime, date, time, timezone
-from dateutil.relativedelta import relativedelta
-import csv
-import json
+
 currentDT = datetime.now()
 
 
@@ -180,6 +181,10 @@ def streams_delta_spot(chart):
 
 # In[ ]:
 
+if os.path.exists("all_spotify.csv") == False:
+    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', 'date', 'streams', 'week',
+                               'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams', 'full_id'])
+    df.to_csv("all_spotify.csv", encoding="utf-8")
 
 # соединяем старые данные с новыми
 all_spotify = pd.read_csv("all_spotify.csv")

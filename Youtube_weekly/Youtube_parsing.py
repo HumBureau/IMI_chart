@@ -20,22 +20,22 @@
 # In[2]:
 
 
+from IPython import get_ipython
+from bs4 import BeautifulSoup
+from datetime import datetime, date, time, timezone
+from dateutil.relativedelta import relativedelta
+from random import randint
+from selenium import webdriver as wb
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from time import sleep
+from webdriver_manager.chrome import ChromeDriverManager
+import csv
+import json
+import os
 import pandas as pd
 import re
 import requests
-import csv
-import datetime
-import json
-from selenium import webdriver as wb
-from IPython import get_ipython
-from bs4 import BeautifulSoup
-from time import sleep
-from random import randint
-from datetime import datetime, date, time, timezone
-from dateutil.relativedelta import relativedelta
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
 
 currentDT = datetime.now()
 
@@ -188,6 +188,10 @@ def streams_delta_yout(chart):
 
 # In[72]:
 
+if os.path.exists("all_youtube.csv") == False:
+    df = pd.DataFrame(columns=['', 'rank', 'title', 'artist', 'date', 'streams', 'week',
+                               'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams'])
+    df.to_csv("all_youtube.csv", encoding="utf-8")
 
 # соединяем старые данные с новыми
 all_youtube = pd.read_csv("all_youtube.csv")

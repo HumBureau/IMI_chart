@@ -33,11 +33,9 @@ from datetime import datetime
 # In[ ]:
 
 
-# TODO: check if file exists
 if os.path.exists("all_deezer.csv") == False:
-    f = file("all_deezer.csv", "w")
-    f.write(',rank,title,artist,date')
-    f.close()
+    df = pd.DataFrame(columns=['rank', 'title', 'artist', "date"])
+    df.to_csv("all_deezer.csv", encoding="utf-8")
 
 # грузим данные за предыдущий день
 all_deezer = pd.read_csv("all_deezer.csv")
