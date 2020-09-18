@@ -1,2 +1,9 @@
-secrets.yaml
+.DS_Store
+
+# instead of secrets.yaml
 **/chrome-data/
+
+**/*.csv
+**/*.html
+**/*.json
+y_nofscrapes.txt
