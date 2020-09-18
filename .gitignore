@@ -7,3 +7,5 @@
 **/*.html
 **/*.json
 y_nofscrapes.txt
+
+**/*.log
