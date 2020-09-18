@@ -251,17 +251,24 @@ for i in all_weekly_charts:
 
 # In[11]:
 
+def isNaN(num):
+    return num != num
 
 # функция для подсчета количества недель, которые песня держится в чарте
+
 
 def weeks_in_chart(weekly_charts):
 
     df = weekly_charts
     # кодируем песню, чтобы избежать путаницы с одинаковыми названиями
     df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"]
+
     return_df = pd.DataFrame(columns=['title', 'artist', "weeks_in_chart"])
 
     for i in set(list(df["full_id"])):
+        if isNaN(i):
+            continue
+
         s_df = df[df["full_id"] == i]  # таблица с одной песней
         n_of_w = len(s_df)
         add_df = pd.DataFrame()
@@ -269,14 +276,6 @@ def weeks_in_chart(weekly_charts):
         add_df["title"] = i.split("#bh#_#bh#")[0]
         add_df["artist"] = i.split("#bh#_#bh#")[1]
         return_df = return_df.append(add_df, ignore_index=True)
-        # TODO: take into account incomplete data?
-        # try:
-        #     add_df["title"] = i.split("#bh#_#bh#")[0]
-        #     add_df["artist"] = i.split("#bh#_#bh#")[1]
-        #     return_df = return_df.append(add_df, ignore_index=True)
-        # except AttributeError:
-        #     print("got error on: ")
-        #     print(i)
 
     return return_df
 
@@ -296,6 +295,14 @@ def metrics_delta(chart):
     best_pos["best_pos"] = best_pos["best_pos"].astype('Int64')
 
     # change in rank vs previous week
+
+    # print(len(chart['week']))
+    # if len(chart['week']) == 0:
+    #     chart_last_week = 0
+    #     chart_dropped = []
+    # else:
+    #     chart_last_week = chart.loc[chart['week'] == chart['week'].values[-1]]  # назначаем  последнюю неделю
+    #     chart_dropped = chart.drop(chart[chart['week'] == chart['week'].values[-1]].index)
 
     chart_last_week = chart.loc[chart['week'] == chart['week'].values[-1]]  # назначаем  последнюю неделю
     chart_dropped = chart.drop(chart[chart['week'] == chart['week'].values[-1]].index)
@@ -332,9 +339,16 @@ def metrics_delta(chart):
 
 # count all new metrics
 
+print("processing apple weekly metrics_delta")
 apple_curr_week = metrics_delta(all_apple_weekly)
+
+print("processing deezer weekly metrics_delta")
 deezer_curr_week = metrics_delta(all_deezer_weekly)
+
+print("processing vk weekly metrics_delta")
 vk_curr_week = metrics_delta(all_vk_weekly)
+
+print("processing yandex weekly metrics_delta")
 yandex_curr_week = metrics_delta(all_yandex_weekly)
 
 
