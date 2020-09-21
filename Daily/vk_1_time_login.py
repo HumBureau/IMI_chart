@@ -7,20 +7,20 @@
 import re
 import requests
 from time import sleep
-from random import randint
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
+from webdriver_manager.firefox import GeckoDriverManager
+import pickle 
 
 
 # In[ ]:
 
 
 ### MANUAL ONE-TIME LOGIN ###
-chrome_options = Options()
-chrome_options.add_argument("--user-data-dir=chrome-data")
-driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-chrome_options.add_argument("user-data-dir=chrome-data")
-driver.get('https://www.vk.com')
+options = Options()
+options.add_argument('-headless')
+browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+browser.get('http://vk.com/')
 sleep(30)  # Time to enter credentials
-driver.quit()
+pickle.dump(browser.get_cookies() , open("vkcooks.pkl","wb")) 
+browser.quit()
+
