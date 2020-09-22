@@ -2,6 +2,8 @@
 
 # instead of secrets.yaml
 **/chrome-data/
+# Daily/vkcooks.pkl
+**/*.pkl
 
 **/*.csv
 **/*.html

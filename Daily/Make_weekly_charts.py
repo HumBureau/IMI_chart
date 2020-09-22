@@ -251,8 +251,11 @@ for i in all_weekly_charts:
 
 # In[11]:
 
+def isNaN(num):
+    return num != num
 
 # функция для подсчета количества недель, которые песня держится в чарте
+
 
 def weeks_in_chart(weekly_charts):
 
@@ -262,6 +265,9 @@ def weeks_in_chart(weekly_charts):
     return_df = pd.DataFrame(columns=['title', 'artist', "weeks_in_chart"])
 
     for i in set(list(df["full_id"])):
+        if isNaN(i):
+            continue
+
         s_df = df[df["full_id"] == i]  # таблица с одной песней
         n_of_w = len(s_df)
         add_df = pd.DataFrame()
