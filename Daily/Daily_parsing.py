@@ -123,27 +123,30 @@ all_apple.to_csv("all_apple.csv", encoding="utf-8")
 # selenium-часть
 chrome_options = Options()
 chrome_options.add_argument("--user-data-dir=chrome-data")
+# chrome_options.add_argument("--window-size=1200,2000")
+chrome_options.add_argument("--disable-gpu")
 # chrome_options.add_argument("--headless")
 br = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-url = 'https://vk.com'
+url = 'https://vk.com/audios528693184?block=chart&section=explore'
 br.get(url)
 sleep(randint(2, 4))
 
-if br.current_url == "https://vk.com/feed":
+# if br.current_url == "https://vk.com/feed":
+if br.current_url == "https://vk.com/audios528693184?block=chart&section=explore":
     print("great, cookies worked for no-login authorisation")
     # now we proceed with scraping
 
-    button2 = br.find_element_by_xpath(
-        '//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
-    button2.click()
-    sleep(randint(4, 5))
-    button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
-    button3.click()
-    sleep(randint(4, 5))
-    button4 = br.find_element_by_css_selector(
-        'div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
-    button4.click()
-    sleep(randint(10, 11))
+    # button2 = br.find_element_by_xpath(
+    #     '//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
+    # button2.click()
+    # sleep(randint(4, 5))
+    # button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
+    # button3.click()
+    # sleep(randint(4, 5))
+    # button4 = br.find_element_by_css_selector(
+    #     'div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
+    # button4.click()
+    # sleep(randint(10, 11))
     soup = BeautifulSoup(br.page_source, "lxml")
     br.quit()
 else:
