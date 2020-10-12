@@ -1,5 +1,5 @@
 # basic implementation
-30 * * * * python ~/IMI_chart/Daily/Yandex_intra_day_parsing.py > ~/IMI_chart/production.log 2>&1
+29,59 * * * * python ~/IMI_chart/Daily/Yandex_intra_day_parsing.py > ~/IMI_chart/production.log 2>&1
 35 * * * * python ~/IMI_chart/Daily/Deezer_daily_parsing.py > ~/IMI_chart/production.log 2>&1
 30 11 * * * python ~/IMI_chart/Daily/Daily_parsing.py > ~/IMI_chart/production.log 2>&1
 14 15 * * * python ~/IMI_chart/Daily/Spotify_daily_parsing.py > ~/IMI_chart/production.log 2>&1
@@ -8,7 +8,7 @@
 1 10 * * 0 python ~/IMI_chart/Youtube_weekly/Youtube_parsing.py > ~/IMI_chart/production.log 2>&1
 
 # mac os dev sample
-50 * * * * cd ~/code/perushevkhmelev/imi/IMI_chart/Daily && python3 Yandex_intra_day_parsing.py > Yandex_intra_day_parsing.log 2>&1
+29,59 * * * * cd ~/code/perushevkhmelev/imi/IMI_chart/Daily && python3 Yandex_intra_day_parsing.py > Yandex_intra_day_parsing.log 2>&1
 52 * * * * cd ~/code/perushevkhmelev/imi/IMI_chart/Daily && python3 Deezer_daily_parsing.py > Deezer_daily_parsing.log 2>&1
 58 12 * * * cd ~/code/perushevkhmelev/imi/IMI_chart/Daily && python3 Daily_parsing.py > Daily_parsing.log 2>&1
 14 15 * * * cd ~/code/perushevkhmelev/imi/IMI_chart/Daily && python3 Spotify_daily_parsing.py > Spotify_daily_parsing.log 2>&1
@@ -17,7 +17,7 @@
 1 10 * * 0 cd ~/code/perushevkhmelev/imi/IMI_chart/Youtube_weekly && python3 Youtube_parsing.py > Youtube_parsing.log 2>&1
 
 # staging sample
-30 * * * * cd ~/IMI_chart/Daily && python3 Yandex_intra_day_parsing.py > Yandex_intra_day_parsing.log 2>&1
+29,59 * * * * cd ~/IMI_chart/Daily && python3 Yandex_intra_day_parsing.py > Yandex_intra_day_parsing.log 2>&1
 35 * * * * cd ~/IMI_chart/Daily && python3 Deezer_daily_parsing.py > Deezer_daily_parsing.log 2>&1
 30 11 * * * cd ~/IMI_chart/Daily && python3 Daily_parsing.py > Daily_parsing.log 2>&1
 14 15 * * * cd ~/IMI_chart/Daily && python3 Spotify_daily_parsing.py > Spotify_daily_parsing.log 2>&1
