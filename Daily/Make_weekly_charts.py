@@ -239,7 +239,7 @@ for i in all_weekly_charts:
     i.drop_duplicates(inplace=True)
 
 
-# In[11]:
+# In[2]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -247,6 +247,8 @@ for i in all_weekly_charts:
 def weeks_in_chart(weekly_charts):
     
     df = weekly_charts
+    df["title"] = df["title"].astype(str)
+    df["artist"] = df["artist"].astype(str)
     df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] # кодируем песню, чтобы избежать путаницы с одинаковыми названиями
 
     return_df = pd.DataFrame(columns = ['title', 'artist', "weeks_in_chart"])
