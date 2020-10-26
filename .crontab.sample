@@ -22,5 +22,6 @@
 30 11 * * * cd ~/IMI_chart/Daily && python3 Daily_parsing.py >> Daily_parsing.log 2>&1
 14 15 * * * cd ~/IMI_chart/Daily && python3 Spotify_daily_parsing.py >> Spotify_daily_parsing.log 2>&1
 30 11 * * 5 cd ~/IMI_chart/Daily && python3 Make_weekly_charts.py >> Make_weekly_charts.log 2>&1
+25 18 * * * cd ~/IMI_chart/Daily && python3 Sber_daily_parsing.py >> Sber_daily_parsing.log 2>&1
 35 11 * * 5 cd ~/IMI_chart/Spotify_weekly && python3 Spotify_parsing.py >> Spotify_parsing.log 2>&1
 1 10 * * 0 cd ~/IMI_chart/Youtube_weekly && python3 Youtube_parsing.py >> Youtube_parsing.log 2>&1

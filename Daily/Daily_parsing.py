@@ -143,9 +143,9 @@ if br.current_url == "https://vk.com/feed":
     button4.click()
     sleep(randint(10, 11))
     soup = BeautifulSoup(br.page_source, "lxml")
-    br.quit()
 else:
     print("ERROR: please do manual login")
+br.quit()
 
 
 # In[15]:
