@@ -80,7 +80,7 @@ def avg():
 # In[50]:
 
 
-### Парсинг ###
+### Скрейпинг ###
 
 yandex_music_top_100_daily = pd.DataFrame(columns=["rank", "title", "artist"])
 # базовая ссылка на последний актуальный ежедневный чарт по России
@@ -149,6 +149,7 @@ else:
     today = datetime.strftime(datetime.now(),"%d/%m/%Y")
     end_time = datetime.strptime(today+ " 23:30", "%d/%m/%Y %H:%M") 
     fd = os.open( "y_nofscrapes.txt", os.O_RDWR|os.O_CREAT)
+    n_of_scrapes = old_n_of_scrapes + 1
     if datetime.now()>= end_time:
         print("that's all for today")
         # обнуляем счетчик
@@ -156,8 +157,7 @@ else:
         os.close(fd)
         # запускаем функцию, которая усредняет все данные за день и сохраняет чарт дня
         avg()
-    else:
-        n_of_scrapes = old_n_of_scrapes + 1        
+    else:       
         os.write(fd, str.encode(str(n_of_scrapes)))  
         os.close(fd)
 
