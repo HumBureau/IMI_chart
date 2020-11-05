@@ -284,8 +284,10 @@ for ch in all_curr_week_charts:
 
     name_of_weekly_chart = "all_"+ name_of_chart +"_weekly.csv" 
     old_csv = pd.read_csv(name_of_weekly_chart)    # загружаем старые данные
-    
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+    
+    old_csv = old_csv[:-len(ch)] # ВАЖНО: удаляем чарт этой недели, в котором еще нет новых метрик
+    
     frames = [old_csv, ch]
     new_csv = pd.concat(frames, sort=False)
     new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8")
