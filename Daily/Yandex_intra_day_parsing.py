@@ -52,7 +52,7 @@ def avg():
         s_df = df[df["full_id"]==i] # таблица с одной песней
         l_w_ranks = list(s_df["rank"])    
         delta = n_of_scrapes - len(s_df) 
-        for i in range(0,delta):
+        for j in range(0,delta):
             l_w_ranks.append(101) # присуждаем песне 101-ю строчку в те моменты, когда она не попала в чарт 
 
         avg_rank = sum(l_w_ranks)/n_of_scrapes # считаем среднюю строку песни 
@@ -129,11 +129,19 @@ else:
     
 
 ### should we update or should we create a new csv file?
-# читаем сколько было скрейпингов уже
-fd = os.open( "y_nofscrapes.txt", os.O_RDWR|os.O_CREAT)
-imp = os.read(fd,100)
-old_n_of_scrapes = int(str(imp)[2:-1])
-os.close( fd )
+
+if os.path.exists("y_nofscrapes.txt") == True:
+    fd = os.open( "y_nofscrapes.txt", os.O_RDWR)
+    imp = os.read(fd,100)
+    old_n_of_scrapes = int(str(imp)[2:-1])
+    os.close( fd )
+else:
+    old_n_of_scrapes = 0
+    fd = os.open( "y_nofscrapes.txt", os.O_CREAT)
+    os.write(fd, str.encode("0"))
+    os.close(fd)
+    
+# читаем сколько было скрейпингов уже   
 
 if old_n_of_scrapes == 0:
     # сохраняем новый файл внутридневной базы данных сегодняшнего дня
@@ -148,7 +156,7 @@ else:
     # будет ли еще хотя бы один запуск скрипта сегодня?
     today = datetime.strftime(datetime.now(),"%d/%m/%Y")
     end_time = datetime.strptime(today+ " 23:30", "%d/%m/%Y %H:%M") 
-    fd = os.open( "y_nofscrapes.txt", os.O_RDWR|os.O_CREAT)
+    fd = os.open( "y_nofscrapes.txt", os.O_RDWR)
     n_of_scrapes = old_n_of_scrapes + 1
     if datetime.now()>= end_time:
         print("that's all for today")
