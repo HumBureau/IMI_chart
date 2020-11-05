@@ -42,17 +42,14 @@ currentDT = datetime.now()
 
 
 # загружаем полные базы данных по всем ежедневным чартам
-all_vk = pd.read_csv("all_vk.csv")
 all_yandex = pd.read_csv("all_yandex.csv")
 all_deezer = pd.read_csv("all_deezer.csv")
 all_apple = pd.read_csv("all_apple.csv")
 
-# загружаем базу данных по ежедневным чартам спотифая, чтобы оценивать место песен за пределами топ 100
-all_daily_spotify = pd.read_csv("all_daily_spotify.csv")
 
 
 # удаляем получающуюся после импорта лишнюю колонку 
-all_charts= [all_apple, all_deezer, all_vk, all_yandex]
+all_charts= [all_apple, all_deezer, all_yandex]
 for i in all_charts:
     i.drop(i.columns[[0]], axis=1, inplace=True)
 
@@ -188,7 +185,7 @@ def name_of_global_obj(xx):
 # считаем недельные чарты для VK, Apple, Deezer
 # выполняем функцию average и обновляем имеющиеся еженедельные чарты из csv в корне
 
-all_simple_charts = [all_apple, all_deezer, all_vk]
+all_simple_charts = [all_apple, all_deezer]
 
 for c in all_simple_charts:
     
@@ -222,13 +219,12 @@ new_csv.to_csv("all_yandex_weekly.csv", encoding = "utf-8")
 
 
 # загружаем все чарты, агрегированные за неделю
-all_vk_weekly = pd.read_csv("all_vk_weekly.csv")
 all_yandex_weekly = pd.read_csv("all_yandex_weekly.csv")
 all_deezer_weekly = pd.read_csv("all_deezer_weekly.csv")
 all_apple_weekly = pd.read_csv("all_apple_weekly.csv")
 
 # чистим колонки для удобства
-all_weekly_charts= [all_apple_weekly, all_deezer_weekly, all_vk_weekly, all_yandex_weekly]
+all_weekly_charts= [all_apple_weekly, all_deezer_weekly, all_yandex_weekly]
 for i in all_weekly_charts:
     try:
         i.drop(i.columns[[0]], axis=1, inplace=True)
@@ -325,7 +321,6 @@ def metrics_delta(chart):
 
 apple_curr_week = metrics_delta(all_apple_weekly)
 deezer_curr_week = metrics_delta(all_deezer_weekly)
-vk_curr_week = metrics_delta(all_vk_weekly)
 yandex_curr_week = metrics_delta(all_yandex_weekly)
 
 
@@ -336,7 +331,6 @@ yandex_curr_week = metrics_delta(all_yandex_weekly)
 
 apple_curr_week.name ="apple"
 deezer_curr_week.name ="deezer"
-vk_curr_week.name ="vk"
 yandex_curr_week.name ="yandex"
 
 
@@ -344,7 +338,7 @@ yandex_curr_week.name ="yandex"
 
 
 ### EXPORT TO JSON, HTML, CSV 
-all_curr_week_charts = [apple_curr_week, deezer_curr_week, vk_curr_week, yandex_curr_week]
+all_curr_week_charts = [apple_curr_week, deezer_curr_week, yandex_curr_week]
 
 for ch in all_curr_week_charts:
     
@@ -358,9 +352,11 @@ for ch in all_curr_week_charts:
     ## EXPORT TO CSV (i.e. MAIN DATABASE) ##
 
     name_of_weekly_chart = "all_"+ name_of_chart +"_weekly.csv" 
-    old_csv = pd.read_csv(name_of_weekly_chart)    # загружаем старые данные
-    
+    old_csv = pd.read_csv(name_of_weekly_chart)    # загружаем старые данные 
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+    
+    old_csv = old_csv[:-len(ch)] # ВАЖНО: удаляем чарт этой недели, в котором еще нет новых метрик
+    
     frames = [old_csv, ch]
     new_csv = pd.concat(frames, sort=False)
     new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8")
