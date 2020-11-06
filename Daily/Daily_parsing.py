@@ -39,8 +39,10 @@ from time import sleep
 from random import randint
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+from webdriver_manager.firefox import GeckoDriverManager
+import pickle 
 
 
 # In[2]:
@@ -52,7 +54,7 @@ currentDT = datetime.now()
 
 # ### Apple Music
 
-# In[91]:
+# In[3]:
 
 
 base_url = 'https://music.apple.com/ru/playlist/top-100-russia/pl.728bd30a9247487c80a483f4168a9dcd'
@@ -93,7 +95,7 @@ date = currentDT - relativedelta(days=+1)
 apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")  
 
 
-# In[7]:
+# In[ ]:
 
 
 # берем имеющийся csv файл и обновляем его
@@ -107,18 +109,10 @@ all_apple.to_csv("all_apple.csv", encoding = "utf-8")
 
 # ### VK 
 
-# In[3]:
+# In[ ]:
 
 
-from selenium.webdriver.firefox.options import Options
-from webdriver_manager.firefox import GeckoDriverManager
-import pickle 
-
-
-# In[5]:
-
-
-#selenium-часть
+# selenium-часть
 options = Options()
 options.add_argument('-headless')
 br = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options = options)
@@ -128,11 +122,9 @@ for cookie in pickle.load(open("vkcooks.pkl", "rb")):
     br.add_cookie(cookie) 
 br.get(url)
 
-sleep(randint(2,4))
-
 if br.current_url == "https://vk.com/feed":
     print("great, cookies worked for no-login authorisation")
-    #now we proceed with scraping
+    # now we proceed with scraping
     
     button2 = br.find_element_by_xpath('//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
     button2.click()
@@ -150,12 +142,6 @@ else:
 
 
 # In[ ]:
-
-
-
-
-
-# In[8]:
 
 
 # работаем с html
@@ -183,43 +169,4 @@ all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) # удаляем получа�
 frames = [all_vk, vk_music_top_100_daily]
 all_vk = pd.concat(frames, sort=False)
 all_vk.to_csv("all_vk.csv", encoding = "utf-8")
-
-
-# In[15]:
-
-
-get_ipython().system('pip install webdriver_manager')
-
-
-# In[3]:
-
-
-from webdriver_manager.firefox import GeckoDriverManager
-
-
-# In[4]:
-
-
-driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-
-
-# In[6]:
-
-
-import pickle 
-
-
-# In[1]:
-
-
-browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-browser.get('http://google.com/')
-pickle.dump(browser.get_cookies() , open("QuoraCookies.pkl","wb")) 
-browser.quit()
-
-
-# In[ ]:
-
-
-
 
