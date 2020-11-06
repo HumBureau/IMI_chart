@@ -108,9 +108,14 @@ all_apple.drop_duplicates(inplace= True)
 all_apple.reset_index(inplace=True)
 all_apple.drop(g.columns[[0]], axis=1, inplace=True)
 
-frames = [all_apple, apple_music_top_100_daily]
-all_apple = pd.concat(frames, sort=False)
-all_apple.to_csv("all_apple.csv", encoding = "utf-8")
+# проверяем, не сохраняли ли мы уже данные за этот день:
+if datetime.strftime(date, "%d/%m/%Y") in set(all_apple["date"]):
+    print("this date's Apple Music data is already saved. Process is stoped so that we do not have duplicates.")
+else:
+    print("this date's Apple Music chart is not in our data yet. I proceed to save it and export to csv.")
+    frames = [all_apple, apple_music_top_100_daily]
+    all_apple = pd.concat(frames, sort=False)
+    all_apple.to_csv("all_apple.csv", encoding = "utf-8")
 
 
 # ### VK 
@@ -178,7 +183,12 @@ all_vk.drop_duplicates(inplace= True)
 all_vk.reset_index(inplace=True)
 all_vk.drop(g.columns[[0]], axis=1, inplace=True)
 
-frames = [all_vk, vk_music_top_100_daily]
-all_vk = pd.concat(frames, sort=False)
-all_vk.to_csv("all_vk.csv", encoding = "utf-8")
+# проверяем, не сохраняли ли мы уже данные за этот день:
+if datetime.strftime(date, "%d/%m/%Y") in set(all_vk["date"]):
+    print("this date's VK chart is already saved. Process is stoped so that we do not have duplicates.")
+else:
+    print("this date's VK chart is not in our data yet. I proceed to save it and export to csv.")
+    frames = [all_vk, vk_music_top_100_daily]
+    all_vk = pd.concat(frames, sort=False)
+    all_vk.to_csv("all_vk.csv", encoding = "utf-8")
 
