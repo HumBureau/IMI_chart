@@ -102,6 +102,12 @@ apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 
 all_apple = pd.read_csv("all_apple.csv")
 all_apple = all_apple.drop(all_apple.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+
+# чистим дубликаты (опыт показал, что они бывают)
+all_apple.drop_duplicates(inplace= True)
+all_apple.reset_index(inplace=True)
+all_apple.drop(g.columns[[0]], axis=1, inplace=True)
+
 frames = [all_apple, apple_music_top_100_daily]
 all_apple = pd.concat(frames, sort=False)
 all_apple.to_csv("all_apple.csv", encoding = "utf-8")
@@ -166,6 +172,12 @@ vk_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 
 all_vk = pd.read_csv("all_vk.csv")
 all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+
+# чистим дубликаты (опыт показал, что они бывают)
+all_vk.drop_duplicates(inplace= True)
+all_vk.reset_index(inplace=True)
+all_vk.drop(g.columns[[0]], axis=1, inplace=True)
+
 frames = [all_vk, vk_music_top_100_daily]
 all_vk = pd.concat(frames, sort=False)
 all_vk.to_csv("all_vk.csv", encoding = "utf-8")
