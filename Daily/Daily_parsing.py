@@ -106,7 +106,7 @@ all_apple = all_apple.drop(all_apple.columns[[0]], axis=1) # удаляем по
 # чистим дубликаты (опыт показал, что они бывают)
 all_apple.drop_duplicates(inplace= True)
 all_apple.reset_index(inplace=True)
-all_apple.drop(g.columns[[0]], axis=1, inplace=True)
+all_apple.drop(all_apple.columns[[0]], axis=1, inplace=True)
 
 # проверяем, не сохраняли ли мы уже данные за этот день:
 if datetime.strftime(date, "%d/%m/%Y") in set(all_apple["date"]):
@@ -181,7 +181,7 @@ all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) # удаляем получа�
 # чистим дубликаты (опыт показал, что они бывают)
 all_vk.drop_duplicates(inplace= True)
 all_vk.reset_index(inplace=True)
-all_vk.drop(g.columns[[0]], axis=1, inplace=True)
+all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
 
 # проверяем, не сохраняли ли мы уже данные за этот день:
 if datetime.strftime(date, "%d/%m/%Y") in set(all_vk["date"]):
