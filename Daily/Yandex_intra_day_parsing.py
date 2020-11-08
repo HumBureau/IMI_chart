@@ -17,10 +17,10 @@
 #  1.1) ВСЕ внутридневные данные -- all_yandex_intra_daily.csv
 #  1.2) внутридневные данные данного дня -- yandex_intra_daily_today.csv
 # 2) если это последний запуск (определяет по времени - если осталось меньше чем 30 минут до полуночи)...
-### ... усредняет данные и создает чарт яндекса за прошедший день, затем обновляет all_yandex.csv
+### ... усредняет данные (из yandex_intra_daily_today.csv !) и создает чарт яндекса за прошедший день, затем обновляет all_yandex.csv
 
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -36,7 +36,7 @@ from time import sleep
 import os
 
 
-# In[34]:
+# In[ ]:
 
 
 def avg():
@@ -77,7 +77,7 @@ def avg():
         yandex_daily_avg.to_csv("all_yandex.csv", mode='a', header = None, encoding = "utf-8")
 
 
-# In[50]:
+# In[ ]:
 
 
 ### Скрейпинг ###
@@ -143,29 +143,35 @@ else:
     
 # читаем сколько было скрейпингов уже   
 
+now = datetime.now()
+
 if old_n_of_scrapes == 0:
     # сохраняем новый файл внутридневной базы данных сегодняшнего дня
     yandex_music_top_100_daily_now.to_csv("yandex_intra_daily_today.csv", encoding = "utf-8")
+    print(now, "created new file for today's intradaily scrapes.")
     n_of_scrapes = 1
     fd = os.open( "y_nofscrapes.txt", os.O_RDWR|os.O_CREAT)
     os.write(fd, str.encode(str(n_of_scrapes)))  
     os.close(fd)
 else:
     # обновляем имеющийся
-    yandex_music_top_100_daily_now.to_csv("yandex_intra_daily_today.csv", mode="a", header = None, encoding = "utf-8") 
+    yandex_music_top_100_daily_now.to_csv("yandex_intra_daily_today.csv", mode="a", header = None, encoding = "utf-8")
+    print(now, "updated today's intradaily scrapes.")
     # будет ли еще хотя бы один запуск скрипта сегодня?
     today = datetime.strftime(datetime.now(),"%d/%m/%Y")
     end_time = datetime.strptime(today+ " 23:30", "%d/%m/%Y %H:%M") 
     fd = os.open( "y_nofscrapes.txt", os.O_RDWR)
     n_of_scrapes = old_n_of_scrapes + 1
     if datetime.now()>= end_time:
-        print("that's all for today")
+        print(now, ": no more scraping for today. I am averaging the intradaily data.")
         # обнуляем счетчик
         os.write(fd, str.encode("0"))
         os.close(fd)
         # запускаем функцию, которая усредняет все данные за день и сохраняет чарт дня
         avg()
+        print(now, ": exported the new daily chart.")
     else:       
+        print(now, ": another scraping round is done. more to come today.")
         os.write(fd, str.encode(str(n_of_scrapes)))  
         os.close(fd)
 
