@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # данный скрипт: 
@@ -64,8 +64,7 @@ br.get(url)
 if br.current_url == "https://vk.com/feed":
     print("great, cookies worked for no-login authorisation")
     # now we proceed with scraping
-    
-    button2 = br.find_element_by_xpath('//*[(@id = "l_aud")]//*[contains(concat( " ", @class, " " ), concat( " ", "fl_l", " " ))]')
+    button2 = br.find_element_by_xpath('//*[@id="l_aud"]/a')
     button2.click()
     sleep(randint(4,5))
     button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
