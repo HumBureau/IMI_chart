@@ -1,23 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[19]:
-
-
-# данный скрипт:
-
-## парсит чарт Deezer (https://www.deezer.com/en/playlist/1116189381)
-## периодичность - 20 минут 
-### все это нужно потому, что чарт не обновляется в известное фиксированное время
-
-# записываемая дата = "сегодня"
-
-# Время запуска скрипта: 00:01 каждый день
-
-# на выходе:
-## если находит новый чарт, обновляет csv all_deezer
-
-
 # In[1]:
 
 
@@ -34,7 +17,7 @@ from datetime import datetime
 # In[ ]:
 
 
-# грузим данные за предыдущий день
+# грузим данные за предыдущие дни
 all_deezer = pd.read_csv("all_deezer.csv")
 all_deezer = all_deezer.drop(all_deezer.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
 
@@ -87,9 +70,9 @@ if o_l != n_l:
     all_deezer.drop(all_deezer.columns[[0]], axis=1, inplace=True)
     all_deezer.to_csv("all_deezer.csv", encoding = "utf-8")
     
-    print("New Deezer chart is found. No more scraping for today!")
+    print(date, ": New Deezer chart is found. No more scraping for today!")
             
 else:
     all_deezer.to_csv("all_deezer.csv", encoding = "utf-8") # сохраняем на всякий случай, если вдруг были дубли и мы их почистили
-    print("Keep scraping. No chart found yet.")
+    print(date, ": Keep scraping. No chart found yet.")
 
