@@ -74,5 +74,5 @@ if o_l != n_l:
             
 else:
     all_deezer.to_csv("all_deezer.csv", encoding = "utf-8") # сохраняем на всякий случай, если вдруг были дубли и мы их почистили
-    print(date, ": Keep scraping. No chart found yet.")
+    print(datetime.now(), ": Keep scraping. No chart found yet.")
 
