@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[8]:
+# In[ ]:
 
 
 # Данный скрипт ежедневно скрейпит топ 100 Сберзвука
@@ -10,7 +10,7 @@
 # ВАЖНО: записываемая дата = день скрейпинга
 
 
-# In[97]:
+# In[ ]:
 
 
 import pandas as pd
@@ -24,13 +24,13 @@ from dateutil.relativedelta import relativedelta
 from os import path
 
 
-# In[98]:
+# In[ ]:
 
 
 currentDT = datetime.now() 
 
 
-# In[99]:
+# In[ ]:
 
 
 base_url = 'https://sber-zvuk.com/top100'
@@ -50,14 +50,14 @@ data = {"rank": [i for i in range(1, len(songs)+1)], "title": songs, "artist":ar
 sber = pd.DataFrame(data)
 
 
-# In[100]:
+# In[ ]:
 
 
 date = currentDT 
 sber["date"] = datetime.strftime(date,"%d/%m/%Y")  
 
 
-# In[102]:
+# In[ ]:
 
 
 # берем имеющийся csv файл и обновляем его
@@ -71,20 +71,14 @@ if path.exists("all_sber.csv") == True:
     all_sber.drop(all_sber.columns[[0]], axis=1, inplace=True)
     
     if datetime.strftime(date, "%d/%m/%Y") in set(all_sber["date"]):
-        print("this date's SBER chart is already in the data. I expect the new scrip to be superior so I am overwriting the old data.")
+        print(date, ": this date's SBER chart is already in the data. I expect the new script to be superior so I am overwriting the old data.")
         all_sber = all_sber[all_sber["date"]!=datetime.strftime(date,"%d/%m/%Y")]
     else:
-        print("this date's SBER chart is not in our data yet. I proceed to save it.")
+        print(date, ": this date's SBER chart is not in our data yet. I proceed to save it.")
     
     frames = [all_sber, sber]
     all_sber = pd.concat(frames, sort=False)
     all_sber.to_csv("all_sber.csv", encoding = "utf-8")
 else:
     sber.to_csv("all_sber.csv", encoding = "utf-8")
-
-
-# In[ ]:
-
-
-
 
