@@ -14,7 +14,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-# In[ ]:
+# In[7]:
 
 
 # грузим данные за предыдущие дни
@@ -27,7 +27,7 @@ all_deezer.reset_index(inplace=True)
 all_deezer.drop(all_deezer.columns[[0]], axis=1, inplace=True)
 
 # берем последние 100 строк, чтобы сверить с новыми
-old_df=all_deezer[-900:-800]
+old_df=all_deezer[-100:]
 o_l = list(old_df["title"])
     
     
@@ -75,4 +75,22 @@ if o_l != n_l:
 else:
     all_deezer.to_csv("all_deezer.csv", encoding = "utf-8") # сохраняем на всякий случай, если вдруг были дубли и мы их почистили
     print(datetime.now(), ": Keep scraping. No chart found yet.")
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
