@@ -73,7 +73,7 @@ if br.current_url == "https://vk.com/feed":
     button4 = br.find_element_by_css_selector('div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
     button4.click()
     sleep(randint(10,11))
-    soup = BeautifulSoup(br.page_source)
+    soup = BeautifulSoup(br.page_source, features="lxml")
     br.quit()
 else:
     print("ERROR: please do manual login")
@@ -116,7 +116,7 @@ now = datetime.now()
 if datetime.strftime(date, "%d/%m/%Y") in set(all_vk["date"]):
     print(now, ": this date's VK data is already saved. Not saving new data.")
 else:
-    print(now, ": this date's Apple Music chart is not in our data yet. I proceed to save it and export to csv.")
+    print(now, ": this date's VK chart is not in our data yet. I proceed to save it and export to csv.")
     frames = [all_vk, vk_music_top_100_daily]
     all_vk = pd.concat(frames, sort=False)
     all_vk.to_csv("all_vk.csv", encoding = "utf-8")
