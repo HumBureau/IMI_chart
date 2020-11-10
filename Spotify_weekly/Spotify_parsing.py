@@ -211,8 +211,9 @@ def artists_scraping():
 a_scrp = False
 
 while a_scrp == False:
-    if len(artists_scraping()) == len(rus_spotify_top_200):
-        rus_spotify_top_200["artist"] = A_L
+    A_L_export = artists_scraping()
+    if len(A_L_export) == len(rus_spotify_top_200):
+        rus_spotify_top_200["artist"] = A_L_export
         a_scrp = True
         print("Artists scraping: success.")
         break
@@ -376,10 +377,10 @@ spotify_curr_week.drop("delta_streams", 1, inplace=True) # drop so that columns 
 spotify_curr_week = pd.merge(spotify_curr_week, sp1, how='left', on=['title', 'artist'])
 
 
-# In[ ]:
+# In[184]:
 
 
-
+rus_spotify_top_200
 
 
 # ### ЭКСПОРТ 
