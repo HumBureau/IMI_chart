@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[98]:
+# In[1]:
 
 
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
+
+from bs4 import BeautifulSoup as bs
 
 
 # In[102]:
