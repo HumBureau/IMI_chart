@@ -104,7 +104,7 @@ def get_artist_names(l, title):
     sleep(5)
     
     # кликаем на кнопку с динамиком, чтобы (1)убрать зеленую полоску снизу (2) активировать возможность грузить новую песню
-    but_sound = br.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[3]/footer/div/div[3]/div/div[3]/button')
+    but_sound = br.find_element_by_xpath("//*[contains(@aria-label, 'Выключить звук')]")    
     but_sound.click()
     
     
