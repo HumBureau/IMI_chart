@@ -38,7 +38,7 @@ else:
     
     # сохраняем новый json
     with open('deezer_old_json.json', 'w') as json_file:
-        json.dump(old_json, json_file)
+        json.dump(deezer_chart_json, json_file)
     
     # грузим данные за предыдущие дни
     all_deezer = pd.read_csv("all_deezer.csv")
