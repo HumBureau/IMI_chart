@@ -37,8 +37,8 @@ else:
     print(now, ": Found new chart in Deezer API.")
     
     # сохраняем новый json
-    with open("deezer_old_json", 'w', encoding='utf-8') as file:
-        deezer_chart_json.to_json(file, force_ascii=False)
+    with open('deezer_old_json.json', 'w') as json_file:
+        json.dump(old_json, json_file)
     
     # грузим данные за предыдущие дни
     all_deezer = pd.read_csv("all_deezer.csv")
@@ -86,10 +86,4 @@ else:
     
     print(date, ": New Deezer chart is saved to data. Length of data: ", len(new_df))
         
-
-
-# In[ ]:
-
-
-
 
