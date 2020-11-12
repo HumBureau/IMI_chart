@@ -107,6 +107,8 @@ else:
     print(now, ": this date's Apple Music chart is not in our data yet. I proceed to save it and export to csv.")
     frames = [all_apple, apple_music_top_100_daily]
     all_apple = pd.concat(frames, sort=False)
+    all_apple.reset_index(inplace = True)
+    all_apple = all_apple.drop(all_apple.columns[[0]], axis=1)  
     all_apple.to_csv("all_apple.csv", encoding = "utf-8")
 
 
