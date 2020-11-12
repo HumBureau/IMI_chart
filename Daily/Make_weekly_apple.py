@@ -94,7 +94,7 @@ def average(df):
             n_of_m_days = 7 - len(not_missing_dates)   
             if n_of_m_days <0:
                 print("Found a song with > 7 appearances in the week. Taking 7 highest ranks.")
-                average_rank = sum(heapq.nsmalles(7, list(one_track_df["rank"]))) / 7
+                average_rank = sum(heapq.nsmallest(7, list(one_track_df["rank"]))) / 7
             else:
                 # добавляем rank = 101 для отсутствующих дней
                 average_rank = (sum(one_track_df["rank"]) + (101*n_of_m_days)) / 7  
