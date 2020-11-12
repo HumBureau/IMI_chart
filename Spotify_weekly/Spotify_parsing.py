@@ -17,7 +17,7 @@
 ### - сохраняет json актуального чарта
 
 
-# In[203]:
+# In[ ]:
 
 
 import os
@@ -41,7 +41,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 currentDT = datetime.now() 
 
 
-# In[204]:
+# In[ ]:
 
 
 # авторизуемся в API спотифая
@@ -51,12 +51,29 @@ client_secret = 'e02805f2372249f1afe66ec7b3d6e20a'
 username = "11158413093"
 scope = "playlist-modify-public"
 playlist_id = "6n485XL3OjM56Lwax8LVQb"
+redirect_uri='http://localhost:8080'
+CACHE = '.spotipyoauthcache'
 
-token = util.prompt_for_user_token(username,scope,client_id=client_id,client_secret=client_secret,redirect_uri='http://localhost/') 
-sp = spotipy.Spotify(auth = token)
+
+### SP - это объект, который занимается авторизацией
+SP = spotipy.oauth2.SpotifyPKCE(client_id=client_id, redirect_uri=redirect_uri, scope=scope, username=username, cache_path = CACHE, proxies=None, requests_timeout=None, requests_session=True, open_browser=False)
 
 
-# In[205]:
+### смело пробуем получить новый access token просто через refresh token, лежащий в кэше
+# 1 берем refresh token 
+refr_t = SP.get_cached_token()["refresh_token"]
+# 2 рефрешим access token
+try:
+    SP.refresh_access_token(refresh_token=refr_t)
+    print(datetime.now(), ": ", "Refreshed access token OK.")
+except Exception as e:
+    print(datetime.now(), ": ", e)
+
+### sp - это объект, который занимается управлением (редактированием плейлистов и т.д.)
+sp = spotipy.Spotify(auth = SP.get_access_token())
+
+
+# In[ ]:
 
 
 # функция, которая собирает данные из spotifycharts, включая ссылки на треки
@@ -108,7 +125,7 @@ def scrape(d):
     return rus_spotify_top_200
 
 
-# In[206]:
+# In[ ]:
 
 
 def get_25_artists(I):
@@ -143,7 +160,7 @@ def get_25_artists(I):
     return i_l
 
 
-# In[207]:
+# In[ ]:
 
 
 # создаем ссылку на нужную неделю
@@ -161,13 +178,13 @@ curr_date_start = cor_m_dates[-1]
 w_f_link = datetime.strftime(curr_date_start, "%Y-%m-%d")+"--"+datetime.strftime(curr_date_start+relativedelta(days = +7), "%Y-%m-%d")
 
 
-# In[208]:
+# In[ ]:
 
 
 full_df = pd.DataFrame(columns = ["rank", "title", "artist", "streams", "week", "link"])
 
 
-# In[209]:
+# In[ ]:
 
 
 # сбор имен артистов через добавление треков из топ-200 в плейлист партиями по 25 треков
@@ -212,7 +229,7 @@ while True:
         sp = spotipy.Spotify(auth = token)
 
 
-# In[210]:
+# In[ ]:
 
 
 # удаляем запятые в числах
@@ -227,7 +244,7 @@ full_df["streams"] = n_s
 
 # ### ФОРМИРУЕМ ПОЛНЫЙ ЧАРТ
 
-# In[212]:
+# In[ ]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -251,7 +268,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[213]:
+# In[ ]:
 
 
 # пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -305,7 +322,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[214]:
+# In[ ]:
 
 
 # функция для подсчета изменения прослушиваний
@@ -331,7 +348,7 @@ def streams_delta_spot(chart):
     return chart_upd
 
 
-# In[221]:
+# In[ ]:
 
 
 if os.path.exists("all_spotify.csv") == False:
@@ -346,14 +363,14 @@ all_spotify = pd.read_csv("all_spotify.csv")
 all_spotify = all_spotify.drop(all_spotify.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
 
 
-# In[223]:
+# In[ ]:
 
 
 frames = [all_spotify, curr_df]
 all_spotify = pd.concat(frames, sort=False) 
 
 
-# In[224]:
+# In[ ]:
 
 
 # подсчитываем все дополнительные показатели
@@ -365,7 +382,7 @@ spotify_curr_week.drop("delta_streams", 1, inplace=True) # drop so that columns 
 spotify_curr_week = pd.merge(spotify_curr_week, sp1, how='left', on=['title', 'artist'])
 
 
-# In[225]:
+# In[ ]:
 
 
 
@@ -386,7 +403,7 @@ spotify_curr_week["week_f_show"] = w_f_show
 
 # ### ЭКСПОРТ 
 
-# In[227]:
+# In[ ]:
 
 
 ### EXPORT TO JSON
@@ -394,7 +411,7 @@ with open('current_spotify_json.json', 'w', encoding='utf-8') as file:
     spotify_curr_week.to_json(file, force_ascii=False)
 
 
-# In[228]:
+# In[ ]:
 
 
 ### EXPORT TO HTML
@@ -404,7 +421,7 @@ spotify_curr_week_html.columns = ["Позиция", "Изменение пози
 spotify_curr_week_html.to_html("current_spotify_html.html", encoding = "utf-8")
 
 
-# In[230]:
+# In[ ]:
 
 
 ### EXPORT TO CSV - (i.e. TO THE MAIN DATABASE)
