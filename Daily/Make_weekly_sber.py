@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[26]:
+# In[1]:
 
 
 # данный скрипт:
@@ -14,7 +14,7 @@
 ## - html с актуальным недельным чартом и аккуратными подписями
 
 
-# In[ ]:
+# In[2]:
 
 
 import pandas as pd
@@ -27,16 +27,17 @@ import datetime
 from datetime import datetime, date, time, timezone
 from dateutil.relativedelta import relativedelta
 from os import path
+import heapq
 
 
-# In[2]:
+# In[3]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[3]:
+# In[4]:
 
 
 # загружаем полные базы данных по всем ежедневным чартам
@@ -48,7 +49,7 @@ for i in all_charts:
     i.drop(i.columns[[0]], axis=1, inplace=True)
 
 
-# In[4]:
+# In[5]:
 
 
 # сделаем вспомогательные объекты для работы с датами
@@ -61,7 +62,13 @@ date_start = currentDT - relativedelta(days=+7)
 date_end = currentDT - relativedelta(days=+1)
 
 
-# In[5]:
+# In[ ]:
+
+
+
+
+
+# In[8]:
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -75,6 +82,8 @@ def average(df):
     # take last week only
 
     last_week_df = df[date_start <= df["Datetime"]]
+    last_week_df = last_week_df[last_week_df["Datetime"] <= date_end ]    
+    
     df = last_week_df
     
     raw_rank = []
@@ -86,9 +95,15 @@ def average(df):
             one_track_df = newdf[newdf["artist"]==j]
             # how many dates are missing? 
             not_missing_dates = list(one_track_df["date"])
-            n_of_m_days = 7 - len(not_missing_dates)            
-            # добавляем rank = 101 для отсутствующих дней
-            average_rank = (sum(one_track_df["rank"]) + (101*n_of_m_days)) / 7  
+            n_of_m_days = 7 - len(not_missing_dates)
+            
+            if n_of_m_days <0:
+                print("Found a song with > 7 appearances in the week. Taking 7 highest ranks. Track:", i)
+                average_rank = sum(heapq.nsmallest(7, list(one_track_df["rank"]))) / 7
+            else:
+                # добавляем rank = 101 для отсутствующих дней
+                average_rank = (sum(one_track_df["rank"]) + (101*n_of_m_days)) / 7 
+ 
             songs.append(i)
             artists.append(j)
             raw_rank.append(average_rank)
@@ -110,7 +125,7 @@ def average(df):
     return new_chart
 
 
-# In[6]:
+# In[9]:
 
 
 # просто техническая функция для отображения изначальных имен чартов
@@ -122,7 +137,7 @@ def name_of_global_obj(xx):
 # In[10]:
 
 
-# считаем недельные чарты для VK, Apple, Deezer
+
 # выполняем функцию average и обновляем имеющиеся еженедельные чарты из csv в корне
 
 all_simple_charts = [all_sber]
@@ -133,7 +148,7 @@ for c in all_simple_charts:
     name_of_chart = str(name_of_global_obj(c)) 
    
 
-    # обновляем csv c предыдущими еженедельными чартами
+   # соединяем данные (больше без лишнего экспорта)
     name_of_weekly_chart = name_of_chart +"_weekly.csv"
     if path.exists(name_of_weekly_chart):
         old_csv = pd.read_csv(name_of_weekly_chart)
@@ -142,35 +157,36 @@ for c in all_simple_charts:
         new_csv = pd.concat(frames, sort=False)
     else:
         new_csv = output_chart
-    new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8") 
+    
+    #new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8") 
 
 
 # ### Добавление колонок, отвечающих за динамику показателей
 
-# In[20]:
+# In[11]:
 
 
 # загружаем все чарты, агрегированные за неделю
-all_sber_weekly = pd.read_csv("all_sber_weekly.csv")
+all_sber_weekly = new_csv
 
 
 # чистим колонки для удобства
-all_weekly_charts= [all_sber_weekly]
-for i in all_weekly_charts:
-    try:
-        i.drop(i.columns[[0]], axis=1, inplace=True)
+#all_weekly_charts= [all_sber_weekly]
+#for i in all_weekly_charts:
+    #try:
+        #i.drop(i.columns[[0]], axis=1, inplace=True)
         # add missing columns (if they are missing)
-        for h in ["weeks_in_chart", "best_pos", "full_id", "delta_rank"]:
-            if h in i.columns:
-                7+9
-            else:
-                i[h]=None
-    except:
-        6+8
-    i.drop_duplicates(inplace=True)
+        #for h in ["weeks_in_chart", "best_pos", "full_id", "delta_rank"]:
+            #if h in i.columns:
+                #7+9
+            #else:
+                #i[h]=None
+    #except:
+        #6+8
+    #i.drop_duplicates(inplace=True)
 
 
-# In[11]:
+# In[12]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -196,7 +212,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[12]:
+# In[13]:
 
 
 # пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -249,7 +265,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[22]:
+# In[14]:
 
 
 #count all new metrics
@@ -259,13 +275,13 @@ sber_curr_week = metrics_delta(all_sber_weekly)
 
 # ### ЭКСПОРТ
 
-# In[23]:
+# In[15]:
 
 
 sber_curr_week.name ="sber"
 
 
-# In[25]:
+# In[16]:
 
 
 ### EXPORT TO JSON, HTML, CSV 
@@ -286,11 +302,15 @@ for ch in all_curr_week_charts:
     old_csv = pd.read_csv(name_of_weekly_chart)    # загружаем старые данные
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
     
-    old_csv = old_csv[:-len(ch)] # ВАЖНО: удаляем чарт этой недели, в котором еще нет новых метрик
+    #old_csv = old_csv[:-len(ch)] # ВАЖНО: удаляем чарт этой недели, в котором еще нет новых метрик
     
     frames = [old_csv, ch]
     new_csv = pd.concat(frames, sort=False)
+    new_csv.reset_index(inplace=True)
+    new_csv = new_csv.drop(new_csv.columns[[0]], axis=1)
     new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8")
+    
+    print(datetime.now(), ": Exported new Sber Zvuk weekly chart. Length:", len(ch))
     
     ## EXPORT TO HTML ##
     # пишем красивые названия колонок
