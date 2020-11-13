@@ -93,7 +93,7 @@ def average(df):
             not_missing_dates = list(one_track_df["date"])
             n_of_m_days = 7 - len(not_missing_dates)   
             if n_of_m_days <0:
-                print("Found a song with > 7 appearances in the week. Taking 7 highest ranks.")
+                print("Found a song with > 7 appearances in the week. Taking 7 highest ranks. Track:", i)
                 average_rank = sum(heapq.nsmallest(7, list(one_track_df["rank"]))) / 7
             else:
                 # добавляем rank = 101 для отсутствующих дней
@@ -290,7 +290,7 @@ for ch in all_curr_week_charts:
     old_csv = pd.read_csv(name_of_weekly_chart)    # загружаем старые данные
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
     
-    old_csv = old_csv[:-len(ch)] # ВАЖНО: удаляем чарт этой недели, в котором еще нет новых метрик
+    #old_csv = old_csv[:-len(ch)] # ВАЖНО: удаляем чарт этой недели, в котором еще нет новых метрик
 
     frames = [old_csv, ch]
     new_csv = pd.concat(frames, sort=False)
