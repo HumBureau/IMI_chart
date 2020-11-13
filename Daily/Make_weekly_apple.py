@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # данный скрипт:
@@ -16,7 +16,7 @@
 ## - сохраняет html и json с актуальным чартом
 
 
-# In[ ]:
+# In[2]:
 
 
 import pandas as pd
@@ -31,14 +31,14 @@ from dateutil.relativedelta import relativedelta
 import heapq
 
 
-# In[ ]:
+# In[3]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[ ]:
+# In[4]:
 
 
 # загружаем полные базы данных по всем ежедневным чартам
@@ -52,7 +52,7 @@ for i in all_charts:
     i.drop(i.columns[[0]], axis=1, inplace=True)
 
 
-# In[ ]:
+# In[5]:
 
 
 # сделаем вспомогательные объекты для работы с датами
@@ -65,7 +65,7 @@ date_start = currentDT - relativedelta(days=+7)
 date_end = currentDT - relativedelta(days=+1)
 
 
-# In[ ]:
+# In[6]:
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -119,7 +119,7 @@ def average(df):
     return new_chart
 
 
-# In[ ]:
+# In[7]:
 
 
 # просто техническая функция для отображения изначальных имен чартов
@@ -128,7 +128,7 @@ def name_of_global_obj(xx):
             if id(oid)==id(xx)][0]
 
 
-# In[ ]:
+# In[8]:
 
 
 # считаем недельные чарты для VK, Apple, Deezer
@@ -149,31 +149,32 @@ for c in all_simple_charts:
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
     frames = [old_csv, output_chart]
     new_csv = pd.concat(frames, sort=False)
-    new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8") 
+    ## не экспортируем больше ничего
+    #new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8") 
 
 
 # ### Добавление колонок, отвечающих за динамику показателей
 
-# In[ ]:
+# In[9]:
 
 
 # загружаем все чарты, агрегированные за неделю
 
-all_apple_weekly = pd.read_csv("all_apple_weekly.csv")
+all_apple_weekly = new_csv
 
 # чистим колонки для удобства
-all_weekly_charts= [all_apple_weekly]
-for i in all_weekly_charts:
-    try:
-        i.drop(i.columns[[0]], axis=1, inplace=True)
+#all_weekly_charts= [all_apple_weekly]
+#for i in all_weekly_charts:
+#    try:
+#        i.drop(i.columns[[0]], axis=1, inplace=True)
         #for h in ["weeks_in_chart", "best_pos", "full_id", "delta_rank"]:
             #i[h] = None
-    except:
-        6+8
+#    except:
+#        6+8
     #i.drop_duplicates(inplace=True)
 
 
-# In[ ]:
+# In[10]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -199,7 +200,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[ ]:
+# In[11]:
 
 
 # пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -252,7 +253,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[ ]:
+# In[12]:
 
 
 #count all new metrics
@@ -262,13 +263,13 @@ apple_curr_week = metrics_delta(all_apple_weekly)
 
 # ### ЭКСПОРТ
 
-# In[ ]:
+# In[13]:
 
 
 apple_curr_week.name ="apple"
 
 
-# In[ ]:
+# In[14]:
 
 
 ### EXPORT TO JSON, HTML, CSV 
@@ -307,6 +308,12 @@ for ch in all_curr_week_charts:
     
     html_name = "current_"+name_of_chart+"_html.html"
     ch_html.to_html(html_name, encoding = "utf-8")
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
