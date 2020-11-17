@@ -17,7 +17,7 @@
 ## - сохраняет 4 json файла с новыми недельными чартами
 
 
-# In[24]:
+# In[1]:
 
 
 import pandas as pd
@@ -33,21 +33,30 @@ from dateutil.relativedelta import relativedelta
 import heapq
 
 
-# In[31]:
+# In[2]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[ ]:
+# In[3]:
+
+
+### TEMP
+DD = "13/11/2020"
+currentDT = datetime.strptime(DD, "%d/%m/%Y")
+currentDT
+
+
+# In[4]:
 
 
 # округляем дату до ровно начала суток
 currentDT = datetime.strptime(datetime.strftime(currentDT, "%d/%m/%Y"), "%d/%m/%Y")
 
 
-# In[43]:
+# In[5]:
 
 
 # загружаем полные базы данных по всем ежедневным чартам
@@ -61,7 +70,7 @@ for i in all_charts:
     i.drop(i.columns[[0]], axis=1, inplace=True)
 
 
-# In[44]:
+# In[6]:
 
 
 # сделаем вспомогательные объекты для работы с датами
@@ -74,7 +83,7 @@ date_start = currentDT - relativedelta(days=+7)
 date_end = currentDT - relativedelta(days=+1)
 
 
-# In[47]:
+# In[7]:
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -104,9 +113,7 @@ def average_ya(df):
             missing_days = list(set(all_dates) - set(not_missing_dates))
             
             print(missing_days)
-                
-            #n_of_m_days = 7 - len(not_missing_dates)
-            
+                        
             # определяем, нет ли песни в чарте за день потому, что вообще чарта для этого дня нет
             denominator = 7            
             added_ranks = []
@@ -131,7 +138,7 @@ def average_ya(df):
                 print("Found a song with more appearances than # of saved charts in this week (including added added 'n+1' ranks). Taking the highest # ranks only. ", i )
                 average_rank = sum(heapq.nsmallest(7, full_ranks)) / denominator
             else:
-                average_rank = (sum(one_track_df["rank"])) / denominator  
+                average_rank = (sum(full_ranks)) / denominator  
             
             songs.append(i)
             artists.append(j)
@@ -154,7 +161,7 @@ def average_ya(df):
     return new_chart
 
 
-# In[48]:
+# In[8]:
 
 
 # просто техническая функция для отображения изначальных имен чартов
@@ -169,7 +176,7 @@ def name_of_global_obj(xx):
 
 
 
-# In[49]:
+# In[9]:
 
 
 # выполняем функцию average_ya и присоединяем получившуюся неделю к имеющимся данным
@@ -184,13 +191,13 @@ new_csv = pd.concat(frames, sort=False, ignore_index=True)
 
 # ### Добавление колонок, отвечающих за динамику показателей
 
-# In[50]:
+# In[10]:
 
 
 all_yandex_weekly = new_csv
 
 
-# In[51]:
+# In[11]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -216,7 +223,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[52]:
+# In[12]:
 
 
 # пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -269,7 +276,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[53]:
+# In[13]:
 
 
 #count all new metrics
@@ -278,13 +285,13 @@ yandex_curr_week = metrics_delta(all_yandex_weekly)
 
 # ### ЭКСПОРТ
 
-# In[54]:
+# In[14]:
 
 
 yandex_curr_week.name ="yandex"
 
 
-# In[55]:
+# In[15]:
 
 
 ### EXPORT TO JSON, HTML, CSV 
