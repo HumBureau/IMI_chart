@@ -22,7 +22,7 @@
 ### - обновляет all_vk.csv
 
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -39,7 +39,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 import pickle 
 
 
-# In[ ]:
+# In[2]:
 
 
 # задаем команду для получения даты
@@ -48,7 +48,7 @@ currentDT = datetime.now()
 
 # ### VK 
 
-# In[ ]:
+# In[23]:
 
 
 # selenium-часть
@@ -62,24 +62,27 @@ for cookie in pickle.load(open("vkcooks.pkl", "rb")):
 br.get(url)
 
 if br.current_url == "https://vk.com/feed":
-    print("great, cookies worked for no-login authorisation")
+    print(datetime.now(), ": great, cookies worked for no-login authorisation")
+    url = "https://vk.com/audios528693184?section=explore&block=chart"
+    br.get(url)
     # now we proceed with scraping
-    button2 = br.find_element_by_xpath('//*[@id="l_aud"]/a')
-    button2.click()
-    sleep(randint(4,5))
-    button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
-    button3.click()
-    sleep(randint(4,5))
-    button4 = br.find_element_by_css_selector('div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
-    button4.click()
-    sleep(randint(10,11))
+    #button2 = br.find_element_by_xpath('//*[@id="l_aud"]/a')
+    #button2.click()
+    #sleep(randint(4,5))
+    #button3 = br.find_element_by_css_selector('div#content li._audio_section_tab__explore > a')
+    #button3 = br.find_element_by_xpath("//a[normalize-space()='Обзор']")
+    #button3.click()
+    #sleep(randint(4,5))
+    #button4 = br.find_element_by_css_selector('div#content div.CatalogBlock__recoms_top_audios_global_header.CatalogBlock__header > div > a')
+    #button4.click()
+    #sleep(randint(10,11))
     soup = BeautifulSoup(br.page_source, features="lxml")
     br.quit()
 else:
     print("ERROR: please do manual login")
 
 
-# In[ ]:
+# In[24]:
 
 
 # работаем с html
@@ -106,9 +109,9 @@ all_vk = pd.read_csv("all_vk.csv")
 all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
 
 # чистим дубликаты (опыт показал, что они бывают)
-all_vk.drop_duplicates(inplace= True)
-all_vk.reset_index(inplace=True)
-all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
+#all_vk.drop_duplicates(inplace= True)
+#all_vk.reset_index(inplace=True)
+#all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
 
 now = datetime.now()
 
@@ -119,5 +122,7 @@ else:
     print(now, ": this date's VK chart is not in our data yet. I proceed to save it and export to csv.")
     frames = [all_vk, vk_music_top_100_daily]
     all_vk = pd.concat(frames, sort=False)
+    all_vk.reset_index(inplace=True)
+    all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
     all_vk.to_csv("all_vk.csv", encoding = "utf-8")
 
