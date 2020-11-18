@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # данный скрипт:
@@ -9,15 +9,13 @@
 ## - стриминги: Yandex
 ## - должен запускаться один раз в неделю утром пятницы после Youtube_parsing и Spotify_parsing
 
-## соединяет получающиеся чарты в единый html файл для публикации на сайте (включая "настоящие" еженедельные чарты)
 
 # на выходе:
-## - обновляет csv файлы с соответствующими еженедельными чартами 4-x стримингов
-## - сохраняет 4 html файла с новыми еженедельными чартами
-## - сохраняет 4 json файла с новыми недельными чартами
+## - обновляет all_yandex_weekly.csv файлы с соответствующими еженедельными чартами 4-x стримингов
+## - сохраняет html и json с актуальным недельным чартом
 
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -33,30 +31,21 @@ from dateutil.relativedelta import relativedelta
 import heapq
 
 
-# In[2]:
+# In[ ]:
 
 
 # задаем команду для получения даты
-#currentDT = datetime.now() 
+currentDT = datetime.now() 
 
 
-# In[3]:
-
-
-### TEMP
-DD = "13/11/2020"
-currentDT = datetime.strptime(DD, "%d/%m/%Y")
-currentDT
-
-
-# In[4]:
+# In[ ]:
 
 
 # округляем дату до ровно начала суток
 currentDT = datetime.strptime(datetime.strftime(currentDT, "%d/%m/%Y"), "%d/%m/%Y")
 
 
-# In[5]:
+# In[ ]:
 
 
 # загружаем полные базы данных по всем ежедневным чартам
@@ -70,7 +59,7 @@ for i in all_charts:
     i.drop(i.columns[[0]], axis=1, inplace=True)
 
 
-# In[6]:
+# In[ ]:
 
 
 # сделаем вспомогательные объекты для работы с датами
@@ -83,7 +72,7 @@ date_start = currentDT - relativedelta(days=+7)
 date_end = currentDT - relativedelta(days=+1)
 
 
-# In[7]:
+# In[ ]:
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -177,7 +166,7 @@ def average_ya(df):
     return new_chart
 
 
-# In[8]:
+# In[ ]:
 
 
 # просто техническая функция для отображения изначальных имен чартов
@@ -186,7 +175,7 @@ def name_of_global_obj(xx):
             if id(oid)==id(xx)][0]
 
 
-# In[9]:
+# In[ ]:
 
 
 # выполняем функцию average_ya и присоединяем получившуюся неделю к имеющимся данным
@@ -201,13 +190,13 @@ new_csv = pd.concat(frames, sort=False, ignore_index=True)
 
 # ### Добавление колонок, отвечающих за динамику показателей
 
-# In[10]:
+# In[ ]:
 
 
 all_yandex_weekly = new_csv
 
 
-# In[11]:
+# In[ ]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -233,7 +222,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[12]:
+# In[ ]:
 
 
 # пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -286,7 +275,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[13]:
+# In[ ]:
 
 
 #count all new metrics
@@ -295,13 +284,13 @@ yandex_curr_week = metrics_delta(all_yandex_weekly)
 
 # ### ЭКСПОРТ
 
-# In[14]:
+# In[ ]:
 
 
 yandex_curr_week.name ="yandex"
 
 
-# In[15]:
+# In[ ]:
 
 
 ### EXPORT TO JSON, HTML, CSV 
