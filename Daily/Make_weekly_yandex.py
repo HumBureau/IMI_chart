@@ -37,7 +37,7 @@ import heapq
 
 
 # задаем команду для получения даты
-currentDT = datetime.now() 
+#currentDT = datetime.now() 
 
 
 # In[3]:
@@ -125,16 +125,18 @@ def average_ya(df):
                     # добавляем rank равный строчке после последней видимой 
                     added_ranks.append(len(one_DAY_df) + 1)  
                 else:
+                    # сокращаем делитель на 1 (т.к. такого дня нет в данных вообще)
                     print("No chart for this day. Will change the demominator in the average rank formula.")
                     print("Day: ", day)
                     denominator = denominator - 1
-                
+                    
+            # создаем полный список строчек (из настоящих и добавленных рангов)   
             full_ranks = added_ranks
             full_ranks.extend(list(one_track_df["rank"]))
                 
-            # считаем среднюю строку за неделю    
+            # наконец считаем среднюю строку за неделю    
             if len(full_ranks) > denominator:
-                # так бывает, если в чарте есть и сингл, и альбом
+                # рангов больше чем делитель. так бывает, если в чарте есть и сингл, и альбом
                 print("Found a song with more appearances than # of saved charts in this week (including added added 'n+1' ranks). Taking the highest # ranks only. ", i )
                 average_rank = sum(heapq.nsmallest(7, full_ranks)) / denominator
             else:
@@ -146,9 +148,23 @@ def average_ya(df):
 
     data = {"raw_rank": raw_rank, "title": songs, "artist": artists}        
     new_chart = pd.DataFrame(data)
+    
+    ### Присуджаем "чистый" номер строчки 
+    
     new_chart.sort_values(by=['raw_rank'], inplace=True)
-
     new_chart['rank'] = new_chart.reset_index().index +1
+    
+    # если raw_rank равен, уравняем rank тоже.
+    prev_raw_r = 0
+    prev_r = 0 
+    for r in new_chart.iterrows():
+        if r[1]["raw_rank"] == prev_raw_r:
+            new_chart.at[r[0], "rank"]=prev_r
+        else:
+            # new "group". so update rank. 
+            prev_r = r[1]["rank"]
+        prev_raw_r = r[1]["raw_rank"]
+
     new_chart.reset_index(inplace=True)
     week = datetime.strftime(date_start,"%d/%m/%y") + " - " + datetime.strftime(date_end,"%d/%m/%y")
     new_chart["week"] = week
@@ -168,12 +184,6 @@ def average_ya(df):
 def name_of_global_obj(xx):
     return [objname for objname, oid in globals().items()
             if id(oid)==id(xx)][0]
-
-
-# In[ ]:
-
-
-
 
 
 # In[9]:
@@ -326,10 +336,4 @@ for ch in all_curr_week_charts:
     
     html_name = "current_"+name_of_chart+"_html.html"
     ch_html.to_html(html_name, encoding = "utf-8")
-
-
-# In[ ]:
-
-
-
 
