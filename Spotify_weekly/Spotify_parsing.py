@@ -191,12 +191,6 @@ w_f_link = datetime.strftime(curr_date_start, "%Y-%m-%d")+"--"+datetime.strftime
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
 full_df = pd.DataFrame(columns = ["rank", "title", "artist", "streams", "week", "link"])
 
 
@@ -411,6 +405,14 @@ w_f_show = datetime.strftime(sd,  "%d-%m-%y")+" - "+datetime.strftime(ed,  "%d-%
 spotify_curr_week["week_f_show"] = w_f_show
 
 
+# In[ ]:
+
+
+# добавляем сумму всех стримов за неделю (для чарта ИМИ)
+
+spotify_curr_week["s_streams"] =  sum(spotify_curr_week["streams"])
+
+
 # ### ЭКСПОРТ 
 
 # In[ ]:
@@ -450,10 +452,4 @@ all_spotify.to_csv("all_spotify.csv", encoding = "utf-8")
 
 now = datetime.now()
 print(now, ": updated all_spotify.csv with this week's chart.")
-
-
-# In[ ]:
-
-
-
 
