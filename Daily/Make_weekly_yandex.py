@@ -100,9 +100,7 @@ def average_ya(df):
             # what dates are missing? 
             not_missing_dates = list(one_track_df["date"])
             missing_days = list(set(all_dates) - set(not_missing_dates))
-            
-            print(missing_days)
-                        
+                                    
             # определяем, нет ли песни в чарте за день потому, что вообще чарта для этого дня нет
             denominator = 7            
             added_ranks = []
@@ -112,7 +110,9 @@ def average_ya(df):
                 if len(one_DAY_df) >0:
                     #print(one_DAY_df)
                     # добавляем rank равный строчке после последней видимой 
-                    added_ranks.append(len(one_DAY_df) + 1)  
+                    added_ranks.append(len(one_DAY_df) + 1) 
+                    print("track ", i, "is not in chart on:", day)
+                    print("I am assigning rank = ", len(one_DAY_df) + 1)
                 else:
                     # сокращаем делитель на 1 (т.к. такого дня нет в данных вообще)
                     print("No chart for this day. Will change the demominator in the average rank formula.")
