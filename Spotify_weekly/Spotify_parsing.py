@@ -84,9 +84,19 @@ def scrape(d):
     base_url = 'https://spotifycharts.com/regional/ru/weekly/'+d
     r = requests.get(base_url)
     # на всякий случай поставим на паузу
-    sleep(randint(1,3))
+    sleep(2)
     soup = BeautifulSoup(r.text, 'html.parser')
     chart = soup.find('table', {'class': 'chart-table'})
+    wt = 2
+    
+    # цикл на случай, если не загрузилось
+    while len(chart) == 0:
+        wt = wt+2
+        r = requests.get(base_url)
+        sleep(wt)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        chart = soup.find('table', {'class': 'chart-table'})
+        
     tbody = chart.find('tbody')
     all_rows = []
 
@@ -176,6 +186,12 @@ if cor_m_dates[-1] +relativedelta(days = +7) > datetime.now():
     
 curr_date_start = cor_m_dates[-1]
 w_f_link = datetime.strftime(curr_date_start, "%Y-%m-%d")+"--"+datetime.strftime(curr_date_start+relativedelta(days = +7), "%Y-%m-%d")
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
@@ -393,12 +409,6 @@ ed = datetime.strptime(w[-10:], "%Y-%m-%d") - relativedelta(days=+1)
 sd = datetime.strptime(w[:10], "%Y-%m-%d") 
 w_f_show = datetime.strftime(sd,  "%d-%m-%y")+" - "+datetime.strftime(ed,  "%d-%m-%y")
 spotify_curr_week["week_f_show"] = w_f_show
-
-
-# In[ ]:
-
-
-
 
 
 # ### ЭКСПОРТ 
