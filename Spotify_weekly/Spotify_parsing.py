@@ -401,7 +401,7 @@ spotify_curr_week = pd.merge(spotify_curr_week, sp1, how='left', on=['title', 'a
 w = spotify_curr_week["week"][0]
 ed = datetime.strptime(w[-10:], "%Y-%m-%d") - relativedelta(days=+1)
 sd = datetime.strptime(w[:10], "%Y-%m-%d") 
-w_f_show = datetime.strftime(sd,  "%d-%m-%y")+" - "+datetime.strftime(ed,  "%d-%m-%y")
+w_f_show = datetime.strftime(sd,  "%d/%m/%y")+" - "+datetime.strftime(ed,  "%d/%m/%y")
 spotify_curr_week["week_f_show"] = w_f_show
 
 
