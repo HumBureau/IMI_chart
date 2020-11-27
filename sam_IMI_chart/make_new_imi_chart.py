@@ -144,7 +144,7 @@ final_charts.to_csv("all_imi_charts.csv", encoding = "utf-8")
 # note: here we put "week" to the front. then beauty_cols function works with this order and puts "Неделя" first
 final_charts_html=final_charts[["week", "rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart"]]
 
-for i in [selected_w]:
+for i in selected_w:
     final_charts.loc[final_charts["week"]==i].to_json("imi_chart_{}.json".format("_".join("".join(i.split("/")).split(" - "))))
     beauty_cols(final_charts_html.loc[final_charts_html["week"]==i]).to_html("imi_chart_{}.html".format("_".join("".join(i.split("/")).split(" - "))), index = False)
 
