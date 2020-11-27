@@ -9,6 +9,8 @@ from statsmodels.nonparametric.kernel_regression import KernelReg
 #import matplotlib.pyplot as plt
 import numpy as np
 
+from make_1_imi_chart import get_paths
+
 # In[4]:
 
 
@@ -17,7 +19,7 @@ def get_fitted_values(week):
 # week - for knowing for which s_spotify values to take s_streams
 
     # делаем working_df с которой будет работать модель
-    working_df = pd.read_csv("all_spotify.csv")
+    working_df = pd.read_csv(get_paths()[1]+"all_spotify.csv")
     working_df = working_df.drop(working_df.columns[[0]], axis=1)
     
     # делаем регрессию
