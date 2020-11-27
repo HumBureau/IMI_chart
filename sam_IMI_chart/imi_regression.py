@@ -6,7 +6,7 @@
 
 import pandas as pd
 from statsmodels.nonparametric.kernel_regression import KernelReg
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 
 # In[4]:
