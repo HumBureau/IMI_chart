@@ -61,13 +61,6 @@ for day in cor_m_dates[:-1]:
     l_links.append(w_f_link)
 
 
-# In[7]:
-
-
-l_links= l_links[:-1]
-l_links
-
-
 # In[8]:
 
 
