@@ -24,7 +24,7 @@ import json
 # In[1]:
 
 
-from make_1_imi_chart import make_1_chart
+from make_1_imi_chart import make_1_chart, get_paths
 from weekly_charts_metrics import metrics_delta, streams_delta
 from restore_imi_charts_functions import beauty_cols
 
@@ -74,8 +74,8 @@ empty_df.to_csv("all_imi_charts.csv", encoding = "utf-8")
 
 # import all weekly charts
 platforms = ["vk", "deezer", "apple", "yandex", "sber"]
-d = {name: pd.read_csv("all_"+name+"_weekly.csv") for name in platforms}
-d["spotify"] = pd.read_csv("all_spotify.csv")
+d = {name: pd.read_csv(get_paths()[0]+"all_"+name+"_weekly.csv") for name in platforms}
+d["spotify"] = pd.read_csv(get_paths()[1]+"all_spotify.csv")
 d["spotify"]["week"] = d["spotify"]["week_f_show"]
 
 all_charts_glued = pd.DataFrame()
