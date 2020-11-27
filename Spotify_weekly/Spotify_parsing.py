@@ -90,7 +90,7 @@ def scrape(d):
     wt = 2
     
     # цикл на случай, если не загрузилось
-    while len(chart) == 0:
+    while chart is None:
         wt = wt+2
         r = requests.get(base_url)
         sleep(wt)
@@ -242,11 +242,17 @@ while True:
 # In[ ]:
 
 
+full_df
+
+
+# In[ ]:
+
+
 # удаляем запятые в числах
 
 n_s = []
 for i in full_df["streams"]:
-    h = int("".join(i.split(",")))
+    h = int("".join(str(i).split(",")))
     n_s.append(h)
 
 full_df["streams"] = n_s
