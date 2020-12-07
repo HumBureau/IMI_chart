@@ -21,7 +21,7 @@
 ### - обновляет all_apple.csv
 
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -34,7 +34,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-# In[ ]:
+# In[2]:
 
 
 # задаем команду для получения даты
@@ -43,7 +43,7 @@ currentDT = datetime.now()
 
 # ### Apple Music
 
-# In[ ]:
+# In[3]:
 
 
 base_url = 'https://music.apple.com/ru/playlist/top-100-russia/pl.728bd30a9247487c80a483f4168a9dcd'
@@ -71,7 +71,8 @@ for i in all_texts:
     s = s.replace("[", "")
     s = s.replace("]", "")
     s = s.strip(" ")
-    s_l.append(s)    
+    s_l.append(s)
+    alb_l = i.findAll('div', attrs={'class':'song-album-wrapper'})
 
 apple_music_top_100_daily = pd.DataFrame()
 apple_music_top_100_daily['title'] = s_l
@@ -82,6 +83,30 @@ apple_music_top_100_daily = apple_music_top_100_daily[['rank', 'title', 'artist'
 # дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
 apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")  
+
+
+# In[23]:
+
+
+# добавляем лейблы
+
+# получаем ссылки на страницы с альбомами
+alb_l = soup.findAll('div', attrs={'class':'song-album-wrapper'})
+alb_l = [i.a["href"] for i in alb_l]
+
+labels_l = []
+for i in alb_l:
+    base_url = i
+    r = requests.get(base_url)
+    sleep(randint(1,3))
+    soup = BeautifulSoup(r.text, 'html.parser')
+    try:
+        labels_l.append(soup.findAll('p', attrs={'class':'song-copyright typography-footnote-emphasized'})[0].get_text())
+    else:
+        print("label not found")
+        labels_l.append("")
+
+apple_music_top_100_daily["label"] = labels_l
 
 
 # In[ ]:
@@ -110,10 +135,4 @@ else:
     all_apple.reset_index(inplace = True)
     all_apple = all_apple.drop(all_apple.columns[[0]], axis=1)  
     all_apple.to_csv("all_apple.csv", encoding = "utf-8")
-
-
-# In[ ]:
-
-
-
 
