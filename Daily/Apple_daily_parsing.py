@@ -43,7 +43,7 @@ currentDT = datetime.now()
 
 # ### Apple Music
 
-# In[3]:
+# In[9]:
 
 
 base_url = 'https://music.apple.com/ru/playlist/top-100-russia/pl.728bd30a9247487c80a483f4168a9dcd'
@@ -51,10 +51,11 @@ r = requests.get(base_url)
 sleep(randint(1,3))
 soup = BeautifulSoup(r.text, 'html.parser')
 
-all_texts = soup.findAll('div', attrs={'class':"song-name-wrapper"})
-
+all_texts = soup.findAll('div', attrs={'class':"row track web-preview song"})
 a_l=[]
 s_l=[]
+labels_l = []
+genres_l = []
 
 for i in all_texts:
     # check if empty artist name
@@ -72,7 +73,23 @@ for i in all_texts:
     s = s.replace("]", "")
     s = s.strip(" ")
     s_l.append(s)
-    alb_l = i.findAll('div', attrs={'class':'song-album-wrapper'})
+    
+    ## get label and genre
+    # для этого получаем ссылки на страницы с альбомами
+    alb_link = i.findAll('div', attrs={'class':'song-album-wrapper'})[0].a["href"]
+    r = requests.get(alb_link)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    try:
+        labels_l.append(soup.findAll('p', attrs={'class':'song-copyright typography-footnote-emphasized'})[0].get_text())
+    except:
+        print("label not found")
+        labels_l.append("")
+    try:
+        g = soup.findAll('h3', attrs={'class':'product-meta typography-footnote-emphasized'})[0].get_text()
+        genres_l.append(g.split("·")[0].strip())
+    except:
+        print("genre not found")
+        genres_l.append("") 
 
 apple_music_top_100_daily = pd.DataFrame()
 apple_music_top_100_daily['title'] = s_l
@@ -80,33 +97,12 @@ apple_music_top_100_daily['artist'] = a_l
 apple_music_top_100_daily['rank'] = apple_music_top_100_daily.reset_index().index +1
 apple_music_top_100_daily = apple_music_top_100_daily[['rank', 'title', 'artist']]
 
+apple_music_top_100_daily["genre"] = genres_l
+apple_music_top_100_daily["label"] = labels_l
+
 # дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
 apple_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")  
-
-
-# In[23]:
-
-
-# добавляем лейблы
-
-# получаем ссылки на страницы с альбомами
-alb_l = soup.findAll('div', attrs={'class':'song-album-wrapper'})
-alb_l = [i.a["href"] for i in alb_l]
-
-labels_l = []
-for i in alb_l:
-    base_url = i
-    r = requests.get(base_url)
-    sleep(randint(1,3))
-    soup = BeautifulSoup(r.text, 'html.parser')
-    try:
-        labels_l.append(soup.findAll('p', attrs={'class':'song-copyright typography-footnote-emphasized'})[0].get_text())
-    else:
-        print("label not found")
-        labels_l.append("")
-
-apple_music_top_100_daily["label"] = labels_l
 
 
 # In[ ]:

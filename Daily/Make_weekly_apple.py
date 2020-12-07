@@ -16,7 +16,7 @@
 ## - сохраняет html и json с актуальным чартом
 
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -29,6 +29,13 @@ import datetime
 from datetime import datetime, date, time, timezone
 from dateutil.relativedelta import relativedelta
 import heapq
+
+
+# In[5]:
+
+
+r = requests.get("https://mail.ru")
+r.status_code
 
 
 # In[ ]:
@@ -342,8 +349,8 @@ for ch in all_curr_week_charts:
     ## EXPORT TO HTML ##
     # пишем красивые названия колонок
     ch_html = ch.drop("raw_rank", 1)
-    ch_html=ch_html[["week", "rank", "delta_rank", "best_pos", "title", "artist", "weeks_in_chart", "label"]]
-    ch_html.columns = ["Неделя", "Позиция", "Изменение позиции vs прошлая неделя", "Лучшая позиция с начала наблюдений (18/09/20 - 24/09/20)", "Название", "Артист", "Недель в чарте", "Лейбл"]                     
+    ch_html=ch_html[["week", "rank", "delta_rank", "best_pos", "title", "artist", "genre", "weeks_in_chart", "label"]]
+    ch_html.columns = ["Неделя", "Позиция", "Изменение позиции vs прошлая неделя", "Лучшая позиция с начала наблюдений (18/09/20 - 24/09/20)", "Название", "Артист", "Жанр", "Недель в чарте с начала наблюдений (18/09/20 - 24/09/20)", "Лейбл"]                     
     
     html_name = "current_"+name_of_chart+"_html.html"
     ch_html.to_html(html_name, encoding = "utf-8")
