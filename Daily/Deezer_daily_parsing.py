@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[111]:
+# In[31]:
 
 
 import pandas as pd
@@ -15,7 +15,7 @@ from datetime import datetime
 from os import path
 
 
-# In[147]:
+# In[54]:
 
 
 def get_new_chart(js):
@@ -35,6 +35,8 @@ def get_new_chart(js):
     # Находим имена ВСЕХ артистов для каждого трека через API трека
 
     A_l = []
+    L_l = []
+    G_l = []
     for i in new_df["id"]:
         api_track = 'https://api.deezer.com/track/'+str(i)
         request_deezer = requests.get(api_track) 
@@ -45,12 +47,30 @@ def get_new_chart(js):
         g_a_l = [i for n, i  in enumerate(a_l) if i not in a_l[:n]] 
         artists = ", ".join(g_a_l) #  delete duplicate mentions
         A_l.append(artists)
-    new_df["artist"] = A_l
-
-    new_df['rank'] = new_df.reset_index().index +1 
-    new_df = new_df[['rank', 'title', 'artist']]
-
         
+        # get label and genres from album API
+        api_album = "https://api.deezer.com/album/"+str(json["album"]["id"])
+        request_deezer = requests.get(api_album) 
+        json = request_deezer.json()
+        try:
+            label = json["label"]
+        except:
+            print("no label found")
+            label =""
+        L_l.append(label)
+        
+        try:
+            genre = ", ".join([i["name"] for i in json["genres"]["data"]])
+        except:
+            print("no genres found")
+            genre =""
+        G_l.append(genre)
+    
+    ## формируем все колонки
+    cols = ['title', 'artist', "genre", "label"]
+    new_df = pd.DataFrame(dict(zip(cols, [list(pd.DataFrame(js["tracks"]["data"])["title"]),A_l,G_l,L_l])))
+    new_df['rank'] = new_df.reset_index().index +1 
+    new_df = new_df[['rank', 'title', 'artist', "genre", "label"]]       
     # задаем дату
     date = datetime.now() 
     new_df["date"] = datetime.strftime(date,"%d/%m/%Y")  
@@ -60,7 +80,6 @@ def get_new_chart(js):
     all_deezer = pd.concat(frames, sort=False)
     
     # чистим
-    #all_deezer.drop_duplicates(inplace=True)
     all_deezer.reset_index(inplace=True) 
     all_deezer.drop(all_deezer.columns[[0]], axis=1, inplace=True)
     all_deezer.to_csv("all_deezer.csv", encoding = "utf-8")
@@ -98,13 +117,4 @@ else:
     print(now, ": No deezer_check_df.csv found. Created new one.")
     
     get_new_chart(deezer_chart_json)
-    
-    
-    
-
-
-# In[ ]:
-
-
-
 
