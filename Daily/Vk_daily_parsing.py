@@ -22,7 +22,7 @@
 ### - обновляет all_vk.csv
 
 
-# In[1]:
+# In[2]:
 
 
 import pandas as pd
@@ -37,21 +37,57 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 import pickle 
+import json
 
 
-# In[2]:
+# In[ ]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
+# In[ ]:
+
+
+def get_genre_streams(item):
+    id_alb_p = "_".join([str(i) for i in json.loads(BeautifulSoup(str(item).split(">")[0]+">", "lxml").div["data-audio"])[-7]])
+    alb_l = "https://vk.com/music/album/"+id_alb_p
+    br.get(alb_l) 
+    sleep(randint(2,4))
+    soup = BeautifulSoup(br.page_source, features="html5lib")
+    l = soup.findAll('div', attrs={'class':"AudioPlaylistSnippet__info"})
+    for i in l:
+        # эти элементы быват двух видов. в одном кол-во прослушиваний, в другом - жанр
+        if "прослушивани" in i.get_text():
+            if "1 аудиозапись" in i.get_text():
+                if "M" in i.get_text():
+                    streams = float(i.get_text().split("M")[0].strip()) *1000000
+                if "K" in i.get_text():
+                    streams = float(i.get_text().split("K")[0].strip()) *1000        
+            elif "аудиозапис" in i.get_text():
+                streams = None
+                # отсеиваем (настоящие) альбомы
+                pass
+            
+            else:
+                if "M" in i.get_text():
+                    streams = float(i.get_text().split("M")[0].strip()) *1000000
+                if "K" in i.get_text():
+                    streams = float(i.get_text().split("K")[0].strip()) *1000
+        else:
+            genre = i.get_text().split("·")[0].strip()
+            
+    return genre, streams
+
+
 # ### VK 
 
-# In[23]:
+# In[ ]:
 
 
-# selenium-часть
+# запускаем селениум и получаем страницу с чартом 
+
 options = Options()
 options.add_argument('-headless')
 br = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options = options)
@@ -64,6 +100,7 @@ br.get(url)
 if br.current_url == "https://vk.com/feed":
     print(datetime.now(), ": great, cookies worked for no-login authorisation")
     url = "https://vk.com/audios528693184?section=explore&block=chart"
+    #url = "https://vk.com/audios8910036?section=explore&block=chart"
     br.get(url)
     # now we proceed with scraping
     #button2 = br.find_element_by_xpath('//*[@id="l_aud"]/a')
@@ -77,12 +114,12 @@ if br.current_url == "https://vk.com/feed":
     #button4.click()
     #sleep(randint(10,11))
     soup = BeautifulSoup(br.page_source, features="lxml")
-    br.quit()
+    #br.quit()
 else:
     print("ERROR: please do manual login")
 
 
-# In[24]:
+# In[ ]:
 
 
 # работаем с html
@@ -90,10 +127,20 @@ else:
 songs = soup.findAll('span', attrs={'class':"audio_row__title_inner _audio_row__title_inner"})
 artists = soup.findAll('div', attrs={'class':"audio_row__performers"})
 
+# получаем жанры и (общее) кол-во прослушиваний
+for_albums = soup.findAll('div', attrs={'onclick':"return getAudioPlayer().toggleAudio(this, event)"})
+genres_labels = [get_genre_streams(i) for i in for_albums]
+
+br.quit()
+
+
+# In[ ]:
+
+
 songs_clean = [i.get_text() for i in songs]
 artists_clean = [i.get_text() for i in artists]
-
-data = {"rank": [i for i in range(1, 101)], "title": songs_clean, "artist":artists_clean}
+cols = ['rank', 'title', 'artist', "genre", "comp_streams"]
+data = dict(zip(cols, [[i for i in range(1, 101)], songs_clean, artists_clean, [i[0] for i in genres_labels],[i[1] for i in genres_labels] ])) 
 vk_music_top_100_daily = pd.DataFrame(data)
 # дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
@@ -107,11 +154,6 @@ vk_music_top_100_daily["date"] = datetime.strftime(date,"%d/%m/%Y")
 
 all_vk = pd.read_csv("all_vk.csv")
 all_vk = all_vk.drop(all_vk.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
-
-# чистим дубликаты (опыт показал, что они бывают)
-#all_vk.drop_duplicates(inplace= True)
-#all_vk.reset_index(inplace=True)
-#all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
 
 now = datetime.now()
 
