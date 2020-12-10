@@ -22,7 +22,7 @@
 ### - обновляет all_vk.csv
 
 
-# In[2]:
+# In[1]:
 
 
 import pandas as pd
@@ -40,14 +40,14 @@ import pickle
 import json
 
 
-# In[ ]:
+# In[2]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[ ]:
+# In[3]:
 
 
 def get_genre_streams(item):
@@ -55,7 +55,7 @@ def get_genre_streams(item):
     alb_l = "https://vk.com/music/album/"+id_alb_p
     br.get(alb_l) 
     sleep(randint(2,4))
-    soup = BeautifulSoup(br.page_source, features="html5lib")
+    soup = BeautifulSoup(br.page_source, features="lxml")
     l = soup.findAll('div', attrs={'class':"AudioPlaylistSnippet__info"})
     for i in l:
         # эти элементы быват двух видов. в одном кол-во прослушиваний, в другом - жанр
@@ -83,7 +83,7 @@ def get_genre_streams(item):
 
 # ### VK 
 
-# In[ ]:
+# In[5]:
 
 
 # запускаем селениум и получаем страницу с чартом 
