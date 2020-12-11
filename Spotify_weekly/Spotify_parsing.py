@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # данный скрипт: 
@@ -17,7 +17,7 @@
 ### - сохраняет json актуального чарта
 
 
-# In[ ]:
+# In[2]:
 
 
 import os
@@ -41,7 +41,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 currentDT = datetime.now() 
 
 
-# In[ ]:
+# In[3]:
 
 
 # авторизуемся в API спотифая
@@ -50,7 +50,7 @@ client_id = 'ab06777876f4480c945208f0d0d16160'
 client_secret = 'e02805f2372249f1afe66ec7b3d6e20a'
 username = "11158413093"
 scope = "playlist-modify-public"
-playlist_id = "6n485XL3OjM56Lwax8LVQb"
+playlist_id = "3zAvWbHI3RiXNU5bQepZxq"
 redirect_uri='http://localhost:8080'
 CACHE = '.spotipyoauthcache'
 
@@ -73,7 +73,7 @@ except Exception as e:
 sp = spotipy.Spotify(auth = SP.get_access_token())
 
 
-# In[ ]:
+# In[4]:
 
 
 # функция, которая собирает данные из spotifycharts, включая ссылки на треки
@@ -135,7 +135,7 @@ def scrape(d):
     return rus_spotify_top_200
 
 
-# In[ ]:
+# In[5]:
 
 
 def get_25_artists(I):
@@ -170,7 +170,7 @@ def get_25_artists(I):
     return i_l
 
 
-# In[ ]:
+# In[6]:
 
 
 # создаем ссылку на нужную неделю
@@ -188,13 +188,23 @@ curr_date_start = cor_m_dates[-1]
 w_f_link = datetime.strftime(curr_date_start, "%Y-%m-%d")+"--"+datetime.strftime(curr_date_start+relativedelta(days = +7), "%Y-%m-%d")
 
 
-# In[ ]:
+# In[7]:
 
 
-full_df = pd.DataFrame(columns = ["rank", "title", "artist", "streams", "week", "link"])
+full_df = pd.DataFrame(columns = ["rank", "title", "artist", "streams", "week", "link", "genre", "label"])
 
 
-# In[ ]:
+# In[37]:
+
+
+def w_e_s(list_):
+    if len(list_) == 0:
+        return ""
+    else:
+        return list_[0]
+
+
+# In[8]:
 
 
 # сбор имен артистов через добавление треков из топ-200 в плейлист партиями по 25 треков
@@ -205,6 +215,11 @@ while True:
         # скрейпим spotifycharts
         curr_df = scrape(w_f_link)
         links = list(curr_df["link"])
+        
+        # добавляем лейблы и жанры
+        curr_df["genre"] = [sp.album(sp.track(i.split("/")[-1])["album"]["id"])["genres"] for i in links]
+        curr_df["label"] = [w_e_s(sp.album(sp.track(i.split("/")[-1])["album"]["id"])["label"]) for i in links]
+        
         id_list=[]
         A_L = []
         for L in links:
@@ -223,7 +238,7 @@ while True:
         curr_df["artist"] = A_L
         print(datetime.now(), ": Added correct artist names")
 
-        curr_df=curr_df[["rank", "title", "artist", "streams", "week", "link"]]
+        curr_df=curr_df[["rank", "title", "artist", "streams", "week", "link", "genre", "label"]]
 
         frames = [full_df, curr_df]
         full_df=pd.concat(frames, sort=False)
@@ -239,13 +254,13 @@ while True:
         sp = spotipy.Spotify(auth = token)
 
 
-# In[ ]:
+# In[9]:
 
 
-full_df
+curr_df
 
 
-# In[ ]:
+# In[10]:
 
 
 # удаляем запятые в числах
@@ -260,7 +275,7 @@ full_df["streams"] = n_s
 
 # ### ФОРМИРУЕМ ПОЛНЫЙ ЧАРТ
 
-# In[ ]:
+# In[11]:
 
 
 # функция для подсчета количества недель, которые песня держится в чарте
@@ -284,7 +299,7 @@ def weeks_in_chart(weekly_charts):
     return return_df
 
 
-# In[ ]:
+# In[12]:
 
 
 # пишем функцию, которая считает best position in chart, weeks in chart, change in rank [vs previous week]
@@ -338,7 +353,7 @@ def metrics_delta(chart):
     return chart_last_week
 
 
-# In[ ]:
+# In[13]:
 
 
 # функция для подсчета изменения прослушиваний
@@ -364,12 +379,12 @@ def streams_delta_spot(chart):
     return chart_upd
 
 
-# In[ ]:
+# In[14]:
 
 
 if os.path.exists("all_spotify.csv") == False:
     df = pd.DataFrame(columns=['rank', 'title', 'artist', 'date', 'streams', 'week',
-                               'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams', 'full_id', "week_f_show"])
+                               'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams', 'full_id', "week_f_show", "genre", "label"])
     df.to_csv("all_spotify.csv", encoding="utf-8")
 
 # соединяем старые данные с новыми (но пока без экспорта)
@@ -379,14 +394,14 @@ all_spotify = pd.read_csv("all_spotify.csv")
 all_spotify = all_spotify.drop(all_spotify.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
 
 
-# In[ ]:
+# In[15]:
 
 
 frames = [all_spotify, curr_df]
 all_spotify = pd.concat(frames, sort=False) 
 
 
-# In[ ]:
+# In[16]:
 
 
 # подсчитываем все дополнительные показатели
@@ -398,7 +413,7 @@ spotify_curr_week.drop("delta_streams", 1, inplace=True) # drop so that columns 
 spotify_curr_week = pd.merge(spotify_curr_week, sp1, how='left', on=['title', 'artist'])
 
 
-# In[ ]:
+# In[17]:
 
 
 
@@ -411,7 +426,7 @@ w_f_show = datetime.strftime(sd,  "%d/%m/%y")+" - "+datetime.strftime(ed,  "%d/%
 spotify_curr_week["week_f_show"] = w_f_show
 
 
-# In[ ]:
+# In[18]:
 
 
 # добавляем сумму всех стримов за неделю (для чарта ИМИ)
@@ -421,7 +436,7 @@ spotify_curr_week["s_streams"] =  sum(spotify_curr_week["streams"])
 
 # ### ЭКСПОРТ 
 
-# In[ ]:
+# In[35]:
 
 
 ### EXPORT TO JSON
@@ -429,17 +444,17 @@ with open('current_spotify_json.json', 'w', encoding='utf-8') as file:
     spotify_curr_week.to_json(file, force_ascii=False)
 
 
-# In[ ]:
+# In[36]:
 
 
 ### EXPORT TO HTML
 # сохраняем html для использования на сайте (т.е. через Make_weekly_charts.py впоследствии)
-spotify_curr_week_html=spotify_curr_week[["rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart", "week_f_show"]]
-spotify_curr_week_html.columns = ["Позиция", "Изменение позиции", "Лучшая позиция", "Название", "Артист", "Прослушивания", "Динамика прослушиваний", "Недель в чарте", "Неделя"]
+spotify_curr_week_html=spotify_curr_week[["rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart", "week_f_show", "genre", "label"]]
+spotify_curr_week_html.columns = ["Позиция", "Изменение позиции vs прошлая неделя", "Лучшая позиция за все время", "Название", "Артист", "Прослушивания", "Динамика прослушиваний vs прошлая неделя", "Недель в чарте за все время", "Неделя", "Жанр", "Лейбл"]
 spotify_curr_week_html.to_html("current_spotify_html.html", encoding = "utf-8")
 
 
-# In[ ]:
+# In[34]:
 
 
 ### EXPORT TO CSV - (i.e. TO THE MAIN DATABASE)
@@ -458,4 +473,10 @@ all_spotify.to_csv("all_spotify.csv", encoding = "utf-8")
 
 now = datetime.now()
 print(now, ": updated all_spotify.csv with this week's chart.")
+
+
+# In[ ]:
+
+
+
 
