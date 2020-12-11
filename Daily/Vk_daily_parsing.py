@@ -22,7 +22,7 @@
 ### - обновляет all_vk.csv
 
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -40,14 +40,14 @@ import pickle
 import json
 
 
-# In[2]:
+# In[ ]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[3]:
+# In[ ]:
 
 
 def get_genre_streams(item):
@@ -83,7 +83,7 @@ def get_genre_streams(item):
 
 # ### VK 
 
-# In[5]:
+# In[ ]:
 
 
 # запускаем селениум и получаем страницу с чартом 
@@ -140,7 +140,7 @@ br.quit()
 songs_clean = [i.get_text() for i in songs]
 artists_clean = [i.get_text() for i in artists]
 cols = ['rank', 'title', 'artist', "genre", "comp_streams"]
-data = dict(zip(cols, [[i for i in range(1, 101)], songs_clean, artists_clean, [i[0] for i in genres_labels],[i[1] for i in genres_labels] ])) 
+data = dict(zip(cols, [[i for i in range(1, len(songs_clean)+1)], songs_clean, artists_clean, [i[0] for i in genres_labels],[i[1] for i in genres_labels] ])) 
 vk_music_top_100_daily = pd.DataFrame(data)
 # дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
@@ -167,4 +167,10 @@ else:
     all_vk.reset_index(inplace=True)
     all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
     all_vk.to_csv("all_vk.csv", encoding = "utf-8")
+
+
+# In[ ]:
+
+
+
 
