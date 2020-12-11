@@ -11,7 +11,11 @@ from dateutil.relativedelta import relativedelta
 import heapq
 
 
-# In[36]:
+def w_e_s(list_):
+    if len(list_) == 0:
+        return ""
+    else:
+        return list_[0]
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -87,8 +91,8 @@ def average(df):
             songs.append(i)
             artists.append(j)
             raw_rank.append(average_rank)
-            genres.append(one_track_df["genre"].dropna().unique().tolist()[0])
-            labels.append(one_track_df["label"].dropna().unique().tolist()[0])
+            genres.append(w_e_s(one_track_df["genre"].dropna().unique().tolist()))
+            labels.append(w_e_s(one_track_df["label"].dropna().unique().tolist()))
     
     # соединяем данные в новую таблицу
     cols = ['raw_rank', 'title', 'artist', "genre", "label"]
