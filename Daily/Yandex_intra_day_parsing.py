@@ -44,7 +44,7 @@ def avg():
     
 # усредняем данные за день и получаем чарт дня 
 
-    yandex_daily_avg = pd.DataFrame(columns = ['raw_rank', 'title', 'artist', "date"])
+    yandex_daily_avg = pd.DataFrame(columns = ['raw_rank', "title", "artist", "date", "genre", "label", "listeners"])
 
     df = pd.read_csv("yandex_intra_daily_today.csv") 
     df["full_id"] = df["title"]+"#bh#_#bh#"+df["artist"] # кодируем песню, чтобы избежать путаницы с одинаковыми названиями
@@ -69,13 +69,18 @@ def avg():
     yandex_daily_avg.reset_index(inplace=True)
     yandex_daily_avg.drop(yandex_daily_avg.columns[[0]], axis=1) # удаляем старый индекс
     yandex_daily_avg.drop(yandex_daily_avg.columns[[0]], axis=1) # удаляем raw_rank
-    yandex_daily_avg=yandex_daily_avg[["rank", 'title', 'artist', "date"]]
+    yandex_daily_avg=yandex_daily_avg[["rank", "title", "artist", "date", "genre", "label", "listeners"]]
     
     # сохраняем чарт дня, обновляя базу all_yandex 
     if os.path.exists("all_yandex.csv") == False:
         yandex_daily_avg.to_csv("all_yandex.csv", encoding = "utf-8")
-    else:
-        yandex_daily_avg.to_csv("all_yandex.csv", mode='a', header = None, encoding = "utf-8")
+    else:        
+        old_csv = pd.read_csv("all_yandex.csv", encoding = "utf-8")
+        old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+        new_csv = pd.concat([old_csv,yandex_daily_avg], ignore_index=True, sort = False)
+        new_csv.reset_index(inplace=True)
+        new_csv.drop(new_csv.columns[[0]], axis=1, inplace=True)
+        new_csv.to_csv("all_yandex.csv", encoding = "utf-8")
 
 
 # In[ ]:
