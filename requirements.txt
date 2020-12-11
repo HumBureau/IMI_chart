@@ -18,3 +18,4 @@ statsmodels==0.11.1
 transliterate==1.10.2
 unicode==2.7
 unicodecsv==0.14.1
+yandex-music==0.1.2
