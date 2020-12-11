@@ -16,6 +16,12 @@ def w_e_s(list_):
         return ""
     else:
         return list_[0]
+    
+def w_e_df(inp):
+    if inp is None:
+        return pd.Series()
+    else:
+        return inp
 
 
 # функция для получения недельного чарта через усреднение ежедневных
@@ -49,7 +55,7 @@ def average(df):
     
     ### start averaging
     
-    raw_rank, songs, artists, genres, labels = ([] for i in range(5))
+    raw_rank, songs, artists, genres, labels, comp_streams = ([] for i in range(6))
 
     for i in list(set(df["title"])):
         newdf = df[df["title"]==i]
@@ -91,8 +97,9 @@ def average(df):
             songs.append(i)
             artists.append(j)
             raw_rank.append(average_rank)
-            genres.append(w_e_s(one_track_df["genre"].dropna().unique().tolist()))
-            labels.append(w_e_s(one_track_df["label"].dropna().unique().tolist()))
+            genres.append(w_e_s(w_e_df(one_track_df.get("genre")).dropna().unique().tolist()))
+            labels.append(w_e_s(w_e_df(one_track_df.get("label")).dropna().unique().tolist()))
+            labels.append(w_e_s(w_e_df(one_track_df.get("comp_streams")).dropna().unique().tolist()))
     
     # соединяем данные в новую таблицу
     cols = ['raw_rank', 'title', 'artist', "genre", "label"]
