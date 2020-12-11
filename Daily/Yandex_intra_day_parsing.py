@@ -3,7 +3,7 @@
 
 # ### Yandex Music - внутридневной парсинг чарта
 
-# In[58]:
+# In[ ]:
 
 
 # данный скрипт:
@@ -20,7 +20,7 @@
 ### ... усредняет данные (из yandex_intra_daily_today.csv !) и создает чарт яндекса за прошедший день, затем обновляет all_yandex.csv
 
 
-# In[59]:
+# In[ ]:
 
 
 import pandas as pd
@@ -34,9 +34,10 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from time import sleep
 import os
+import json
 
 
-# In[60]:
+# In[ ]:
 
 
 def avg():
@@ -77,53 +78,89 @@ def avg():
         yandex_daily_avg.to_csv("all_yandex.csv", mode='a', header = None, encoding = "utf-8")
 
 
-# In[62]:
+# In[ ]:
 
 
-### Скрейпинг ###
+# создаем словарь жанров
+try:
+    from yandex_music.client import Client
+    client = Client()
+    client = Client.from_credentials('tegusigalpa444@yandex.ru', 'aintthateasy')
 
-yandex_music_top_100_daily = pd.DataFrame(columns=["rank", "title", "artist"])
-# базовая ссылка на последний актуальный ежедневный чарт по России
-base_url = 'https://music.yandex.ru/chart'
-r = requests.get(base_url)
-# на всякий случай поставим на паузу
-sleep(3)
-# находим в верстке сайта интересующие нас части
-soup = BeautifulSoup(r.text, 'html.parser')
-songs = soup.findAll('div', attrs={'class':'d-track__name'})
-artists = soup.findAll('span', attrs={'class':'d-track__artists'})
+    gs = client.genres()
 
-# делаем список вторичных названий песен (слов вроде remix, cover, и тд), чтобы они не сливались с названиями 
-sec_titles = soup.findAll('span', attrs={'class':'d-track__version deco-typo-secondary'})
-sec_titles_clean = [i.get_text() for i in sec_titles]
-sec_titles_clean = sorted(sec_titles_clean, reverse=True, key=len)
+    keys=[]
+    values = []
 
-
-# чистим названия песен и артистов
-songs_clean = [i.get_text() for i in songs]
-new_l=[]
-for i in songs_clean:
-    for j in sec_titles_clean:
-        if j in i:
-            v = i.replace(j, " ("+j+")")
-            break
+    # создаем полный словарь 
+    for i in range(0, len(gs)):
+        if len(gs[i].sub_genres) ==0:
+            values.append(gs[i].titles["ru"]["title"])
+            keys.append(gs[i].id)
         else:
-            v = i
-    new_l.append(v)
-songs_clean = new_l
-artists_clean = [i.get_text() for i in artists]
+            values.append(gs[i]["title"])   
+            keys.append(gs[i].id)    
+            for j in range (0,len(gs[i].sub_genres)):
+                values.append(gs[i].sub_genres[j].titles["ru"]["title"])
+                keys.append(gs[i].sub_genres[j].id)
+    d_of_genres = dict(zip(keys, values))
+    out_file = open("ya_genres_dict.json", "w", encoding='utf8') 
+    json.dump(d_of_genres, out_file, ensure_ascii=False) 
+    out_file.close() 
+except:
+    print("Error: failed to refresh genres with yandex_music.client. Using the old dictionary instead.")
+    d_of_genres = json.load(open("ya_genres_dict.json", "r", encoding='utf8') )
 
 
-yandex_music_top_100_daily_now = pd.DataFrame()
-yandex_music_top_100_daily_now['title'] = songs_clean
-yandex_music_top_100_daily_now['artist'] = artists_clean
-yandex_music_top_100_daily_now['rank'] = yandex_music_top_100_daily_now.reset_index().index +1
-yandex_music_top_100_daily_now= yandex_music_top_100_daily_now[['rank', 'title', 'artist']]
+# In[ ]:
+
+
+### Get chart from API
+
+request_ya = requests.get('https://api.music.yandex.net/landing3/chart/russia') # ссылка на постоянный плейлист
+chart_json = request_ya.json() # через API получаем json 
+df = pd.DataFrame(chart_json["result"]["chart"]["tracks"])
+
+listeners = [int(i["listeners"]) for i in  df["chart"]]
+artists = [", ".join([j["name"] for j in i.get("artists") or []]) for i in df["track"]]
+labels = [", ".join(j.get("name") for j in i["albums"][0].get("labels") or []) for i in df["track"]] 
+songs = [i["title"] for i in df["track"]]
+genres = [(d_of_genres.get(i["albums"][0].get("genre")) or "") for i in df["track"]]
+ranks = [int(i["position"]) for i in df["chart"] ]
+
+# добавляем вторичные названия (remix, OST, etc)
+add_titles = []
+for i in df["track"]:
+    try:
+        add =  " ({})".format(i["version"])
+    except:
+        add = ""
+    add_titles.append(add)
+songs = list(map(lambda a,b: a+b,songs, add_titles))   
+
+# Соединяем все данные в актуальный чарт
+cols = ["rank", "title", "artist", "genre", "label", "listeners"]
+DF = pd.DataFrame(dict(zip(cols, [ranks, songs, artists, genres, labels, listeners])))
+
+
+# In[ ]:
+
+
+### Экспорт 
+
+#yandex_music_top_100_daily = pd.DataFrame(columns=["rank", "title", "artist"])
+
+yandex_music_top_100_daily_now= DF
 yandex_music_top_100_daily_now["time"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 # пополняем базу данных ВСЕХ внутридневных скрейпингов (просто чтобы было)
 if os.path.exists("all_yandex_intra_daily.csv") == True:
-    yandex_music_top_100_daily_now.to_csv("all_yandex_intra_daily.csv", mode='a', header = None,  encoding = "utf-8")
+    old_csv = pd.read_csv("all_yandex_intra_daily.csv")
+    old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+    new_csv = pd.concat([old_csv,yandex_music_top_100_daily_now], ignore_index=True, sort = False)
+    new_csv.reset_index(inplace=True)
+    new_csv.drop(new_csv.columns[[0]], axis=1, inplace=True)
+    new_csv.to_csv("all_yandex_intra_daily.csv", encoding = "utf-8")
 else:
     yandex_music_top_100_daily_now.to_csv("all_yandex_intra_daily.csv", header = None,  encoding = "utf-8")
     
@@ -158,7 +195,14 @@ if old_n_of_scrapes == 0:
     os.close(fd)
 else:
     # обновляем имеющийся
-    yandex_music_top_100_daily_now.to_csv("yandex_intra_daily_today.csv", mode="a", header = None, encoding = "utf-8")
+    old_csv = pd.read_csv("yandex_intra_daily_today.csv")
+    old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+    new_csv = pd.concat([old_csv,yandex_music_top_100_daily_now], ignore_index=True, sort = False)
+    new_csv.reset_index(inplace=True)
+    new_csv.drop(new_csv.columns[[0]], axis=1, inplace=True)
+    new_csv.to_csv("yandex_intra_daily_today.csv", encoding = "utf-8")
+    
+    #yandex_music_top_100_daily_now.to_csv("yandex_intra_daily_today.csv", mode="a", header = None, encoding = "utf-8")
     print(now, "updated today's intradaily scrapes.")
     # будет ли еще хотя бы один запуск скрипта сегодня?
     today = datetime.strftime(datetime.now(),"%d/%m/%Y")
@@ -180,4 +224,10 @@ else:
         print(now, ": another scraping round is done. more to come today.")
         file.write(str(n_of_scrapes))
         file.close()
+
+
+# In[ ]:
+
+
+
 
