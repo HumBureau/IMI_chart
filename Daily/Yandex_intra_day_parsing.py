@@ -19,6 +19,8 @@
 # 2) если это последний запуск (определяет по времени - если осталось меньше чем 30 минут до полуночи)...
 ### ... усредняет данные (из yandex_intra_daily_today.csv !) и создает чарт яндекса за прошедший день, затем обновляет all_yandex.csv
 
+#  Примечание: данный скрипт пока что не сохраняет listeners. Так как не придуман агоритм перевода ежеполучасного показателя в среднедневной
+
 
 # In[ ]:
 
@@ -35,6 +37,16 @@ from dateutil.relativedelta import relativedelta
 from time import sleep
 import os
 import json
+
+
+# In[ ]:
+
+
+def w_none(list_):
+    if len(list_) == 0:
+        return None
+    else:
+        return list_[0]
 
 
 # In[ ]:
@@ -62,6 +74,8 @@ def avg():
         add_df["title"] = i.split("#bh#_#bh#")[0]
         add_df["artist"] = i.split("#bh#_#bh#")[1]
         add_df["date"] = list(s_df["time"])[0].split(" ")[0] # записываем день
+        for q in ["genre", "label"]:  
+            add_df[q]=w_none(s_df[q].dropna().unique().tolist())
         yandex_daily_avg = yandex_daily_avg.append(add_df, ignore_index=True)
 
     yandex_daily_avg.sort_values(by=['raw_rank'], inplace=True)
@@ -69,7 +83,7 @@ def avg():
     yandex_daily_avg.reset_index(inplace=True)
     yandex_daily_avg.drop(yandex_daily_avg.columns[[0]], axis=1) # удаляем старый индекс
     yandex_daily_avg.drop(yandex_daily_avg.columns[[0]], axis=1) # удаляем raw_rank
-    yandex_daily_avg=yandex_daily_avg[["rank", "title", "artist", "date", "genre", "label", "listeners"]]
+    yandex_daily_avg=yandex_daily_avg[["rank", "title", "artist", "date", "genre", "label"]]
     
     # сохраняем чарт дня, обновляя базу all_yandex 
     if os.path.exists("all_yandex.csv") == False:
@@ -222,7 +236,7 @@ else:
         file.close()
         #os.write(fd, str.encode("0"))
         #os.close(fd)
-        # запускаем функцию, которая усредняет все данные за день и сохраняет чарт дня
+        ####### !запускаем функцию, которая усредняет все данные за день и сохраняет чарт дня
         avg()
         print(now, ": exported the new daily chart.")
     else:       
