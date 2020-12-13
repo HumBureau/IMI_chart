@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[7]:
 
 
 # данный скрипт: 
@@ -22,7 +22,7 @@
 ### - обновляет all_vk.csv
 
 
-# In[ ]:
+# In[8]:
 
 
 import pandas as pd
@@ -40,21 +40,23 @@ import pickle
 import json
 
 
-# In[ ]:
+# In[9]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[ ]:
+# In[10]:
 
 
 def get_genre_streams(item):
+    
+    streams = None # видимо, бывает так, что никакой инфы про прослушивания нет вообще (а аутпут все равно нужен)
     id_alb_p = "_".join([str(i) for i in json.loads(BeautifulSoup(str(item).split(">")[0]+">", "lxml").div["data-audio"])[-7]])
     alb_l = "https://vk.com/music/album/"+id_alb_p
     br.get(alb_l) 
-    sleep(randint(2,4))
+    sleep(randint(4,5))
     soup = BeautifulSoup(br.page_source, features="lxml")
     l = soup.findAll('div', attrs={'class':"AudioPlaylistSnippet__info"})
     for i in l:
@@ -75,6 +77,7 @@ def get_genre_streams(item):
                     streams = float(i.get_text().split("M")[0].strip()) *1000000
                 if "K" in i.get_text():
                     streams = float(i.get_text().split("K")[0].strip()) *1000
+            
         else:
             genre = i.get_text().split("·")[0].strip()
             
@@ -83,7 +86,7 @@ def get_genre_streams(item):
 
 # ### VK 
 
-# In[ ]:
+# In[11]:
 
 
 # запускаем селениум и получаем страницу с чартом 
@@ -119,7 +122,7 @@ else:
     print("ERROR: please do manual login")
 
 
-# In[ ]:
+# In[12]:
 
 
 # работаем с html
@@ -129,18 +132,18 @@ artists = soup.findAll('div', attrs={'class':"audio_row__performers"})
 
 # получаем жанры и (общее) кол-во прослушиваний
 for_albums = soup.findAll('div', attrs={'onclick':"return getAudioPlayer().toggleAudio(this, event)"})
-genres_labels = [get_genre_streams(i) for i in for_albums]
+genres_streams = [get_genre_streams(i) for i in for_albums]
 
 br.quit()
 
 
-# In[ ]:
+# In[13]:
 
 
 songs_clean = [i.get_text() for i in songs]
 artists_clean = [i.get_text() for i in artists]
 cols = ['rank', 'title', 'artist', "genre", "comp_streams"]
-data = dict(zip(cols, [[i for i in range(1, len(songs_clean)+1)], songs_clean, artists_clean, [i[0] for i in genres_labels],[i[1] for i in genres_labels] ])) 
+data = dict(zip(cols, [[i for i in range(1, len(songs_clean)+1)], songs_clean, artists_clean, [i[0] for i in genres_streams],[i[1] for i in genres_streams] ])) 
 vk_music_top_100_daily = pd.DataFrame(data)
 # дата = предыдущий день (относительно дня скрейпинга)
 date = currentDT - relativedelta(days=+1)
@@ -167,10 +170,4 @@ else:
     all_vk.reset_index(inplace=True)
     all_vk.drop(all_vk.columns[[0]], axis=1, inplace=True)
     all_vk.to_csv("all_vk.csv", encoding = "utf-8")
-
-
-# In[ ]:
-
-
-
 
