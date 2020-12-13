@@ -25,7 +25,7 @@ def w_e_df(inp):
 
 
 # функция для получения недельного чарта через усреднение ежедневных
-# только для apple, deezer, VK
+# только для apple, deezer, VK, sber
 
 
 def average(df):
@@ -99,14 +99,14 @@ def average(df):
             raw_rank.append(average_rank)
             genres.append(w_e_s(w_e_df(one_track_df.get("genre")).dropna().unique().tolist()))
             labels.append(w_e_s(w_e_df(one_track_df.get("label")).dropna().unique().tolist()))
-            labels.append(w_e_s(w_e_df(one_track_df.get("comp_streams")).dropna().unique().tolist()))
+            #comp_streams.append(w_e_s(w_e_df(one_track_df.get("comp_streams")).dropna().unique().tolist()))
     
     # соединяем данные в новую таблицу
     cols = ['raw_rank', 'title', 'artist', "genre", "label"]
     data = dict(zip(cols, [raw_rank, songs, artists, genres, labels]))        
     new_chart = pd.DataFrame(data)
     
-    ### Присуджаем "чистый" номер строчки 
+    ### Присуждаем "чистый" номер строчки 
     
     new_chart.sort_values(by=['raw_rank'], inplace=True)
     new_chart['rank'] = new_chart.reset_index().index +1
