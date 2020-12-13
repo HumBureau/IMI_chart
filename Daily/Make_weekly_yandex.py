@@ -30,6 +30,8 @@ from datetime import datetime, date, time, timezone
 from dateutil.relativedelta import relativedelta
 import heapq
 
+from Make_weekly_charts_functions import w_e_df, w_e_s
+
 
 # In[ ]:
 
@@ -90,9 +92,8 @@ def average_ya(df):
     
     #print(df)
     
-    raw_rank = []
-    songs =[]
-    artists = []
+    raw_rank, songs, artists, genres, labels = ([] for i in range(5))
+
     for i in list(set(df["title"])):
         newdf = df[df["title"]==i]
         for j in list(set(newdf["artist"])):
@@ -134,8 +135,12 @@ def average_ya(df):
             songs.append(i)
             artists.append(j)
             raw_rank.append(average_rank)
+            genres.append(w_e_s(w_e_df(one_track_df.get("genre")).dropna().unique().tolist()))
+            labels.append(w_e_s(w_e_df(one_track_df.get("label")).dropna().unique().tolist()))
 
-    data = {"raw_rank": raw_rank, "title": songs, "artist": artists}        
+    cols = ['raw_rank', 'title', 'artist', "genre", "label"]
+    data = dict(zip(cols, [raw_rank, songs, artists, genres, labels]))    
+      
     new_chart = pd.DataFrame(data)
     
     ### Присуджаем "чистый" номер строчки 
@@ -158,7 +163,7 @@ def average_ya(df):
     week = datetime.strftime(date_start,"%d/%m/%y") + " - " + datetime.strftime(date_end,"%d/%m/%y")
     new_chart["week"] = week
     
-    new_chart = new_chart[['rank', 'title', 'artist', "week", "raw_rank"]]
+    new_chart = new_chart[['rank', 'title', 'artist', "week", "raw_rank", "genre", "label"]]
     
     # округляем raw_rank
     new_chart["raw_rank"] = round(new_chart["raw_rank"], 3)
@@ -185,7 +190,6 @@ old_csv = pd.read_csv("all_yandex_weekly.csv")
 old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
 frames = [old_csv, output_chart]
 new_csv = pd.concat(frames, sort=False, ignore_index=True)
-#new_csv.to_csv("all_yandex_weekly.csv", encoding = "utf-8") 
 
 
 # ### Добавление колонок, отвечающих за динамику показателей
@@ -320,9 +324,15 @@ for ch in all_curr_week_charts:
     ## EXPORT TO HTML ##
     # пишем красивые названия колонок
     ch_html = ch.drop("raw_rank", 1)
-    ch_html=ch_html[["rank", "delta_rank", "best_pos", "title", "artist", "weeks_in_chart", "week"]]
-    ch_html.columns = ["Позиция", "Изменение позиции", "Лучшая позиция", "Название", "Артист", "Недель в чарте", "Неделя"]           
+    ch_html=ch_html[["week", "rank", "delta_rank", "best_pos", "title", "artist", "genre", "weeks_in_chart", "label"]]
+    ch_html.columns = ["Неделя", "Позиция", "Изменение позиции vs прошлая неделя", "Лучшая позиция с начала наблюдений (18/09/20 - 24/09/20)", "Название", "Артист", "Жанр", "Недель в чарте с начала наблюдений (18/09/20 - 24/09/20)", "Лейбл"]                     
     
     html_name = "current_"+name_of_chart+"_html.html"
     ch_html.to_html(html_name, encoding = "utf-8")
+
+
+# In[ ]:
+
+
+
 
