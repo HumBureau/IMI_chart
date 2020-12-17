@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[ ]:
 
 
 # данный скрипт: 
@@ -22,7 +22,7 @@
 ### - обновляет all_vk.csv
 
 
-# In[8]:
+# In[ ]:
 
 
 import pandas as pd
@@ -40,53 +40,59 @@ import pickle
 import json
 
 
-# In[9]:
+# In[ ]:
 
 
 # задаем команду для получения даты
 currentDT = datetime.now() 
 
 
-# In[10]:
+# In[ ]:
 
 
 def get_genre_streams(item):
     
     streams = None # видимо, бывает так, что никакой инфы про прослушивания нет вообще (а аутпут все равно нужен)
-    id_alb_p = "_".join([str(i) for i in json.loads(BeautifulSoup(str(item).split(">")[0]+">", "lxml").div["data-audio"])[-7]])
-    alb_l = "https://vk.com/music/album/"+id_alb_p
-    br.get(alb_l) 
-    sleep(randint(4,5))
-    soup = BeautifulSoup(br.page_source, features="lxml")
-    l = soup.findAll('div', attrs={'class':"AudioPlaylistSnippet__info"})
-    for i in l:
-        # эти элементы быват двух видов. в одном кол-во прослушиваний, в другом - жанр
-        if "прослушивани" in i.get_text():
-            if "1 аудиозапись" in i.get_text():
-                if "M" in i.get_text():
-                    streams = float(i.get_text().split("M")[0].strip()) *1000000
-                if "K" in i.get_text():
-                    streams = float(i.get_text().split("K")[0].strip()) *1000        
-            elif "аудиозапис" in i.get_text():
-                streams = None
-                # отсеиваем (настоящие) альбомы
-                pass
-            
+    l_w_album_path = json.loads(BeautifulSoup(str(item).split(">")[0]+">", "lxml").div["data-audio"])[-7]
+    if l_w_album_path!=False:
+        id_alb_p = "_".join([str(i) for i in l_w_album_path])
+        alb_l = "https://vk.com/music/album/"+id_alb_p
+        br.get(alb_l) 
+        sleep(randint(4,5))
+        soup = BeautifulSoup(br.page_source, features="lxml")
+        l = soup.findAll('div', attrs={'class':"AudioPlaylistSnippet__info"})
+        for i in l:
+            # эти элементы быват двух видов. в одном кол-во прослушиваний, в другом - жанр
+            if "прослушивани" in i.get_text():
+                if "1 аудиозапись" in i.get_text():
+                    if "M" in i.get_text():
+                        streams = float(i.get_text().split("M")[0].strip()) *1000000
+                    if "K" in i.get_text():
+                        streams = float(i.get_text().split("K")[0].strip()) *1000        
+                elif "аудиозапис" in i.get_text():
+                    streams = None
+                    # отсеиваем (настоящие) альбомы
+                    pass
+
+                else:
+                    if "M" in i.get_text():
+                        streams = float(i.get_text().split("M")[0].strip()) *1000000
+                    if "K" in i.get_text():
+                        streams = float(i.get_text().split("K")[0].strip()) *1000
+
             else:
-                if "M" in i.get_text():
-                    streams = float(i.get_text().split("M")[0].strip()) *1000000
-                if "K" in i.get_text():
-                    streams = float(i.get_text().split("K")[0].strip()) *1000
-            
-        else:
-            genre = i.get_text().split("·")[0].strip()
+                genre = i.get_text().split("·")[0].strip()
+    else:
+        genre = None
+        streams = None
+        print("no album page found for a track ", json.loads(BeautifulSoup(str(item).split(">")[0]+">", "lxml").div["data-audio"])[3])
             
     return genre, streams
 
 
 # ### VK 
 
-# In[11]:
+# In[ ]:
 
 
 # запускаем селениум и получаем страницу с чартом 
@@ -122,7 +128,7 @@ else:
     print("ERROR: please do manual login")
 
 
-# In[12]:
+# In[ ]:
 
 
 # работаем с html
@@ -137,7 +143,7 @@ genres_streams = [get_genre_streams(i) for i in for_albums]
 br.quit()
 
 
-# In[13]:
+# In[ ]:
 
 
 songs_clean = [i.get_text() for i in songs]
