@@ -17,7 +17,7 @@
 ### - сохраняет json актуального чарта
 
 
-# In[ ]:
+# In[15]:
 
 
 import os
@@ -41,7 +41,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 currentDT = datetime.now() 
 
 
-# In[ ]:
+# In[16]:
 
 
 # авторизуемся в API спотифая
@@ -50,7 +50,7 @@ client_id = 'ab06777876f4480c945208f0d0d16160'
 client_secret = 'e02805f2372249f1afe66ec7b3d6e20a'
 username = "11158413093"
 scope = "playlist-modify-public"
-playlist_id = "6n485XL3OjM56Lwax8LVQb"
+playlist_id = "3zAvWbHI3RiXNU5bQepZxq"
 redirect_uri='http://localhost:8080'
 CACHE = '.spotipyoauthcache'
 
@@ -73,7 +73,7 @@ except Exception as e:
 sp = spotipy.Spotify(auth = SP.get_access_token())
 
 
-# In[ ]:
+# In[17]:
 
 
 # функция, которая собирает данные из spotifycharts, включая ссылки на треки
@@ -90,8 +90,8 @@ def scrape(d):
     wt = 2
     
     # цикл на случай, если не загрузилось
-    while len(chart) == 0:
-        wt = wt+2
+    while chart is None:
+        wt = max(30, wt+2)
         r = requests.get(base_url)
         sleep(wt)
         soup = BeautifulSoup(r.text, 'html.parser')
@@ -117,13 +117,6 @@ def scrape(d):
     # создаем читаемый датафрейм в pandas
     rus_spotify_top_200 = pd.DataFrame(all_rows, columns =['rank','link', "title",'streams'])
 
-    #date = дата скрейпинга!
-    #rus_spotify_top_200["date"] = currentDT.strftime("%d/%m/%Y")  
-
-    # записываем неделю 
-    #date_start = currentDT - relativedelta(days=+7)
-    #date_end = currentDT - relativedelta(days=+1)
-    #week = datetime.strftime(date_start,"%d/%m/%y") + " - " + datetime.strftime(date_end,"%d/%m/%y")
     week = d
     rus_spotify_top_200["week"] = week
 
@@ -135,7 +128,7 @@ def scrape(d):
     return rus_spotify_top_200
 
 
-# In[ ]:
+# In[18]:
 
 
 def get_25_artists(I):
@@ -170,7 +163,7 @@ def get_25_artists(I):
     return i_l
 
 
-# In[ ]:
+# In[19]:
 
 
 # создаем ссылку на нужную неделю
@@ -188,19 +181,23 @@ curr_date_start = cor_m_dates[-1]
 w_f_link = datetime.strftime(curr_date_start, "%Y-%m-%d")+"--"+datetime.strftime(curr_date_start+relativedelta(days = +7), "%Y-%m-%d")
 
 
-# In[ ]:
+# In[20]:
 
 
+full_df = pd.DataFrame(columns = ["rank", "title", "artist", "streams", "week", "link", "genre", "label"])
 
 
-
-# In[ ]:
-
-
-full_df = pd.DataFrame(columns = ["rank", "title", "artist", "streams", "week", "link"])
+# In[21]:
 
 
-# In[ ]:
+def w_e_s(list_):
+    if len(list_) == 0:
+        return ""
+    else:
+        return list_[0]
+
+
+# In[22]:
 
 
 # сбор имен артистов через добавление треков из топ-200 в плейлист партиями по 25 треков
@@ -211,12 +208,16 @@ while True:
         # скрейпим spotifycharts
         curr_df = scrape(w_f_link)
         links = list(curr_df["link"])
+        
+        # добавляем лейблы и жанры
+        curr_df["genre"] = [w_e_s(sp.album(sp.track(i.split("/")[-1])["album"]["id"])["genres"]) for i in links]
+        curr_df["label"] = [sp.album(sp.track(i.split("/")[-1])["album"]["id"])["label"] for i in links]
+        
         id_list=[]
         A_L = []
         for L in links:
             id_list.append(L.split("/")[-1])
             if len(id_list) == 25:
-                #print(id_list)
                 sp.user_playlist_add_tracks(username, playlist_id = playlist_id, tracks = id_list, position=None)
                 A_L.extend(get_25_artists(playlist_id))
                 # clear playlist
@@ -224,12 +225,11 @@ while True:
                 # clear list 
                 s_id_list = id_list
                 id_list = []
-                #print(len(A_L), A_L)
 
         curr_df["artist"] = A_L
         print(datetime.now(), ": Added correct artist names")
 
-        curr_df=curr_df[["rank", "title", "artist", "streams", "week", "link"]]
+        curr_df=curr_df[["rank", "title", "artist", "streams", "week", "link", "genre", "label"]]
 
         frames = [full_df, curr_df]
         full_df=pd.concat(frames, sort=False)
@@ -239,10 +239,6 @@ while True:
         break
     except Exception as e:
         print(datetime.now(), ": ", e)
-        sp.user_playlist_remove_all_occurrences_of_tracks(username, playlist_id=playlist_id, tracks = s_id_list, snapshot_id=None)
-        sleep(3600)
-        token = util.prompt_for_user_token(username,scope,client_id=client_id,client_secret=client_secret,redirect_uri='http://localhost/') 
-        sp = spotipy.Spotify(auth = token)
 
 
 # In[ ]:
@@ -252,7 +248,7 @@ while True:
 
 n_s = []
 for i in full_df["streams"]:
-    h = int("".join(i.split(",")))
+    h = int("".join(str(i).split(",")))
     n_s.append(h)
 
 full_df["streams"] = n_s
@@ -369,7 +365,7 @@ def streams_delta_spot(chart):
 
 if os.path.exists("all_spotify.csv") == False:
     df = pd.DataFrame(columns=['rank', 'title', 'artist', 'date', 'streams', 'week',
-                               'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams', 'full_id', "week_f_show"])
+                               'delta_rank', 'weeks_in_chart', 'best_pos', 'delta_streams', 'full_id', "week_f_show", "genre", "label"])
     df.to_csv("all_spotify.csv", encoding="utf-8")
 
 # соединяем старые данные с новыми (но пока без экспорта)
@@ -407,8 +403,16 @@ spotify_curr_week = pd.merge(spotify_curr_week, sp1, how='left', on=['title', 'a
 w = spotify_curr_week["week"][0]
 ed = datetime.strptime(w[-10:], "%Y-%m-%d") - relativedelta(days=+1)
 sd = datetime.strptime(w[:10], "%Y-%m-%d") 
-w_f_show = datetime.strftime(sd,  "%d-%m-%y")+" - "+datetime.strftime(ed,  "%d-%m-%y")
+w_f_show = datetime.strftime(sd,  "%d/%m/%y")+" - "+datetime.strftime(ed,  "%d/%m/%y")
 spotify_curr_week["week_f_show"] = w_f_show
+
+
+# In[ ]:
+
+
+# добавляем сумму всех стримов за неделю (для чарта ИМИ)
+
+spotify_curr_week["s_streams"] =  sum(spotify_curr_week["streams"])
 
 
 # ### ЭКСПОРТ 
@@ -426,8 +430,8 @@ with open('current_spotify_json.json', 'w', encoding='utf-8') as file:
 
 ### EXPORT TO HTML
 # сохраняем html для использования на сайте (т.е. через Make_weekly_charts.py впоследствии)
-spotify_curr_week_html=spotify_curr_week[["rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart", "week_f_show"]]
-spotify_curr_week_html.columns = ["Позиция", "Изменение позиции", "Лучшая позиция", "Название", "Артист", "Прослушивания", "Динамика прослушиваний", "Недель в чарте", "Неделя"]
+spotify_curr_week_html=spotify_curr_week[["rank", "delta_rank", "best_pos", "title", "artist", "streams", "delta_streams", "weeks_in_chart", "week_f_show", "genre", "label"]]
+spotify_curr_week_html.columns = ["Позиция", "Изменение позиции vs прошлая неделя", "Лучшая позиция за все время", "Название", "Артист", "Прослушивания", "Динамика прослушиваний vs прошлая неделя", "Недель в чарте за все время", "Неделя", "Жанр", "Лейбл"]
 spotify_curr_week_html.to_html("current_spotify_html.html", encoding = "utf-8")
 
 
@@ -450,10 +454,4 @@ all_spotify.to_csv("all_spotify.csv", encoding = "utf-8")
 
 now = datetime.now()
 print(now, ": updated all_spotify.csv with this week's chart.")
-
-
-# In[ ]:
-
-
-
 
