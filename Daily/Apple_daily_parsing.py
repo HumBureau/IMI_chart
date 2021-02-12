@@ -48,7 +48,7 @@ currentDT = datetime.now()
 
 base_url = 'https://music.apple.com/ru/playlist/top-100-russia/pl.728bd30a9247487c80a483f4168a9dcd'
 r = requests.get(base_url)
-sleep(randint(1,3))
+sleep(randint(3,5))
 soup = BeautifulSoup(r.text, 'html.parser')
 
 all_texts = soup.findAll('div', attrs={'class':"row track web-preview song"})
