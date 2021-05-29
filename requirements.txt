@@ -8,7 +8,7 @@ lxml==4.5.2
 colorama==0.4.3
 configparser==5.0.0
 crayons==0.4.0
-webdriver-manager==3.2.2
+webdriver-manager==3.4.2
 pep8==1.7.1
 autopep8==1.5.4
 ipython==7.16.1

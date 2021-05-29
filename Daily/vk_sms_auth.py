@@ -28,7 +28,7 @@ options = Options()
 options.add_argument('-headless')
 br = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options)
 br.get('http://vk.com/')
-sleep(9)  # Time to enter credentials
+# sleep(9)  # Time to enter credentials # no need in waiting, user will be entering creds long enough for page to load
 e_mail_window = br.find_element_by_css_selector("#index_email")
 password_window = br.find_element_by_css_selector("#index_pass")
 login_vk = input('Введите логин: ')
@@ -37,6 +37,7 @@ e_mail_window.send_keys(login_vk)
 password_window.send_keys(password_vk)
 button1 = br.find_element_by_xpath('//*[(@id = "index_login_button")]')
 button1.click()
+sleep(1) # give time to app to process request
 
 if br.current_url == "https://vk.com/login?act=authcheck":
     print("script is forced to go through SMS authorisation")

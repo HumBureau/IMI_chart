@@ -108,8 +108,8 @@ br.get(url)
 
 if br.current_url == "https://vk.com/feed":
     print(datetime.now(), ": great, cookies worked for no-login authorisation")
-    url = "https://vk.com/audios528693184?section=explore&block=chart"
-    #url = "https://vk.com/audios8910036?section=explore&block=chart"
+    url = "https://vk.com/audios528693184?block=tracks_chart&section=explore"
+    #url = "https://vk.com/audios8910036?block=tracks_chart&section=explore"
     br.get(url)
     # now we proceed with scraping
     #button2 = br.find_element_by_xpath('//*[@id="l_aud"]/a')
