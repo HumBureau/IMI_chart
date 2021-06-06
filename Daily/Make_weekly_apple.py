@@ -73,6 +73,7 @@ for c in all_simple_charts:
     old_csv = pd.read_csv(name_of_weekly_chart)
     
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
+
     frames = [old_csv, output_chart]
     new_csv = pd.concat(frames, sort=False, ignore_index=True)
  
@@ -199,11 +200,22 @@ for ch in all_curr_week_charts:
     name_of_weekly_chart = "all_"+ name_of_chart +"_weekly.csv" 
     old_csv = pd.read_csv(name_of_weekly_chart)    # загружаем старые данные
     old_csv = old_csv.drop(old_csv.columns[[0]], axis=1) # удаляем получающуюся после импорта лишнюю колонку 
-    
+
+    # чистим дубликаты (один раз для очистки weekly файла)
+    # old_csv.drop_duplicates(inplace= True)
+    # old_csv.reset_index(inplace=True)
+    # old_csv.drop(old_csv.columns[[0]], axis=1, inplace=True)
+
     frames = [old_csv, ch]
     new_csv = pd.concat(frames, sort=False)
     new_csv.reset_index(inplace=True)
     new_csv = new_csv.drop(new_csv.columns[[0]], axis=1)
+
+    # чистим дубликаты (один раз для очистки weekly файла)
+    # new_csv.drop_duplicates(inplace= True)
+    # new_csv.reset_index(inplace=True)
+    # new_csv.drop(new_csv.columns[[0]], axis=1, inplace=True)
+
     new_csv.to_csv(name_of_weekly_chart, encoding = "utf-8")
     
     print(datetime.now(), ": Exported new Apple Music weekly chart. Length:", len(ch))
